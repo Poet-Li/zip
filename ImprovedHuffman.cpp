@@ -3,9 +3,20 @@
 #include <string>
 #include <map>
 using namespace std;
+class matrix
+{
+	public:
+		int size;
+		double** val;
+		matrix(int size)
+		{
+			size = size;
+			val = (double**) malloc(size * size * sizeof(double));
+		}
+};
 class Solution
 {
-private:
+public:
     //data
     string originalStr; //初始字符集
     int len;            //字符集长度
@@ -17,12 +28,12 @@ private:
     double forwardtemp3; //三阶向前转移概率阈值
     double backtemp3;    //三阶向后转移概率阈值
 
-    vector<vector<double>> p1; //一阶向前转移矩阵
-    vector<vector<double>> n1; //一阶向后转移矩阵
-    vector<vector<double>> p2; //二阶向前转移矩阵
-    vector<vector<double>> n2; //二阶向后转移矩阵
-    vector<vector<double>> p3; //三阶向前转移矩阵
-    vector<vector<double>> n4; //三阶向后转移矩阵
+    matrix p1; //一阶向前转移矩阵
+    matrix n1; //一阶向后转移矩阵
+    matrix p2; //二阶向前转移矩阵
+    matrix n2; //二阶向后转移矩阵
+    matrix p3; //三阶向前转移矩阵
+    matrix n4; //三阶向后转移矩阵
 
     map<string, int> stringset;      //字符子串与权重的一一映射
     map<string, string> huffmanCode; //字符子串与编码的一一映射
@@ -62,8 +73,6 @@ private:
     void countRate(){
         
     }//计算压缩率
-
-public:
     void solve()
     {
         readFlie();
