@@ -33,7 +33,7 @@ public:
     matrix p2; //二阶向前转移矩阵
     matrix n2; //二阶向后转移矩阵
     matrix p3; //三阶向前转移矩阵
-    matrix n4; //三阶向后转移矩阵
+    matrix n3; //三阶向后转移矩阵
 
     map<string, int> stringset;      //字符子串与权重的一一映射
     map<string, string> huffmanCode; //字符子串与编码的一一映射
