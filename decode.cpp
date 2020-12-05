@@ -17,8 +17,10 @@ void encode() {
     while (!Coding.empty()) {
         auto iter = CodeToWord.find(Coding.substr(0, TempLength));
         if (iter != CodeToWord.end()) {
-        decodeStr += iter->second;
-        TempLength = 0;
+            decodeStr += iter->second;
+            Coding.erase(Coding.begin(), Coding.begin() + TempLength);
+            TempLength = 0;
         }
         TempLength++;
     }
+}
