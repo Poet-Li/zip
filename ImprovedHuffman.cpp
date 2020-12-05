@@ -2,17 +2,23 @@
 #include <vector>
 #include <string>
 #include <map>
+#define MAX 100001
 using namespace std;
 class matrix
 {
-	public:
-		int size;
-		double** val;
-		matrix(int size)
-		{
-			size = size;
-			val = (double**) malloc(size * size * sizeof(double));
-		}
+public:
+    int size;
+    double **val;
+    matrix(int size = 1)
+    {
+        size = size;
+        val = (double **)malloc(size * size * sizeof(double));
+    }
+    ~matrix()
+    {
+        if (val != NULL)
+            delete val;
+    }
 };
 class Solution
 {
@@ -20,13 +26,10 @@ public:
     //data
     string originalStr; //初始字符集
     int len;            //字符集长度
+    double compressionRate;
 
-    double forwardtemp1; //一阶向前转移概率阈值
-    double backtemp1;    //一阶向后转移概率阈值
-    double forwardtemp2; //二阶向前转移概率阈值
-    double backtemp2;    //二阶向后转移概率阈值
-    double forwardtemp3; //三阶向前转移概率阈值
-    double backtemp3;    //三阶向后转移概率阈值
+    double forwardtemp[MAX]; //一阶向前转移概率阈值
+    double backtemp[MAX];    //一阶向后转移概率阈值
 
     matrix p1; //一阶向前转移矩阵
     matrix n1; //一阶向后转移矩阵
@@ -40,39 +43,21 @@ public:
     string Strcode;                  //整个字符串对应的编码集
     string decodeStr;                //解码后的字符串
     //func
-    void readFlie()
-    {
+    void readFlie(); //将txt文件读入originalStr中
 
-    } //将txt文件读入originalStr中
+    void statistics(); //数据统计模块，用originalStr计算出一二三阶的向前向后转移阈值与转移矩阵（共6个值，6个矩阵需要计算）
 
-    void statistics()
-    {
+    void calculatetemp(); //计算阈值
 
-    } //数据统计模块，用originalStr计算出一二三阶的向前向后转移阈值与转移矩阵（共6个值，6个矩阵需要计算）
+    void judgeRelation(); //相关性判断模块，由originalStr和转移矩阵构建stringset
 
-    void judgeRelation()
-    {
+    void bulidTree(); //由stringset构建哈夫曼树，得到数据huffmanCode
 
-    } //相关性判断模块，由originalStr和转移矩阵构建stringset
+    void encode(); //压缩编码,由huffmanCode得到Strcode
 
-    void bulidTree()
-    {
+    void decode(); //解压缩，由huffmanCode和Strcode得到decodeStr
 
-    } //由stringset构建哈夫曼树，得到数据huffmanCode
-
-    void encode()
-    {
-
-    } //压缩编码,由huffmanCode得到Strcode
-
-    void decode()
-    {
-
-    }//解压缩，由huffmanCode和Strcode得到decodeStr
-
-    void countRate(){
-        
-    }//计算压缩率
+    void countRate(); //计算压缩率
     void solve()
     {
         readFlie();
@@ -84,6 +69,19 @@ public:
         countRate();
     }
 };
+/////
+void Solution::calculatetemp()
+{
+
+}
+void Solution::countRate()
+{
+    compressionRate = Strcode.length() / (originalStr.length() * 8);
+    cout << "The compression rate is " << compressionRate << endl;
+}
+void judgeRelation()
+{
+}
 int main()
 {
     Solution s;
