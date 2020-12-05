@@ -1,7 +1,8 @@
 /*
-
+实现buildTree函数
+杰哥写的模板里面函数都是没有参数的，我实现就按照没有参数的写了。
+实际上调用的参数是三个全局的map变量
 */
-
 
 #include <iostream>
 #include <map>
@@ -23,15 +24,6 @@ class TreeNode {
     TreeNode* left;
     TreeNode* right;
     string huffcode;
-    TreeNode(node a) {
-        Node = a;
-        right = nullptr;
-        left = nullptr;
-    }
-    TreeNode() {
-        right = nullptr;
-        left = nullptr;
-    }
 };
 
 struct compare {  //用于优先队列的比较
@@ -40,6 +32,7 @@ struct compare {  //用于优先队列的比较
     }
 };
 
+//通过构造好的哈夫曼树获得哈夫曼编码，存入两个map中；
 void getHuffmanCode(TreeNode* treenode, string code) {
     treenode->huffcode = code;
     if (treenode->left != nullptr) getHuffmanCode(treenode->left, code + "0");
@@ -50,7 +43,7 @@ void getHuffmanCode(TreeNode* treenode, string code) {
     }
 }
 
-void buildTree() {  //由stringset构建哈夫曼树，得到数据huffmanCode
+void buildTree() {  //由stringset构建哈夫曼树，然后调用getHuffmanCode()
     vector<node> Vec(stringset.begin(), stringset.end());
     int KeyNumber = Vec.size();
     priority_queue<TreeNode*, vector<TreeNode*>, compare> Queue;
@@ -61,7 +54,7 @@ void buildTree() {  //由stringset构建哈夫曼树，得到数据huffmanCode
         tempnode->Node = Vec.back();
         Vec.pop_back();
         Queue.push(tempnode);
-    }
+    }  //以上为将stringset中的内容转化为哈夫曼树的节点并存入优先队列
 
     TreeNode* node1 = new TreeNode();
     TreeNode* node2 = new TreeNode();
@@ -79,15 +72,15 @@ void buildTree() {  //由stringset构建哈夫曼树，得到数据huffmanCode
         Newnode->Node.second = node1->Node.second + node2->Node.second;
 
         Queue.push(Newnode);
-    }
+    }  //构造哈夫曼树，得到根节点root
     TreeNode* root = Queue.top();
     getHuffmanCode(root, "");
+    delete node1;
+    delete node2;
 }
 
 
-
-
-//以下为测试代码
+// 以下为本地单文件测试代码
 // int main() {
 //     stringset["aaa"] = 1;
 //     stringset["bbb"] = 2;

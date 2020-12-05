@@ -51,7 +51,7 @@ public:
 
     void judgeRelation(); //相关性判断模块，由originalStr和转移矩阵构建stringset
 
-    void bulidTree(); //由stringset构建哈夫曼树，得到数据huffmanCode
+    void buildTree(); //由stringset构建哈夫曼树，得到数据huffmanCode
 
     void encode(); //压缩编码,由huffmanCode得到Strcode
 
@@ -63,7 +63,7 @@ public:
         readFlie();
         statistics();
         judgeRelation();
-        bulidTree();
+        buildTree();
         encode();
         decode();
         countRate();
