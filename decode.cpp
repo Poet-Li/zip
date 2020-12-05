@@ -8,7 +8,7 @@ encode()的三个参数分别为：
 
 2.string类型 解压后文件名             
 如："out.txt" (也要加文件名后缀)      
-若文件不存在，则会创建并且写入。若文件已经存在，则会在其原本内容后面加上。
+若文件不存在，则会创建并且写入。若文件已经存在，会覆盖原文件。
 
 3.map<string, string> CodeToWord;  //编码到单词的映射
 
@@ -21,7 +21,7 @@ encode()的三个参数分别为：
 #include <string>
 #include <vector>
 
-#define MaxLengthOfBin 99999999  //二进制文件的最长长度
+#define MaxLengthOfBin 1999999  //二进制文件的最长长度  大概最大就两百万，再打就爆栈了
 
 using namespace std;
 

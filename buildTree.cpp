@@ -81,22 +81,21 @@ void buildTree() {  //由stringset构建哈夫曼树，然后调用getHuffmanCod
 
 
 // 以下为本地单文件测试代码
-// int main() {
-//     stringset["aaa"] = 1;
-//     stringset["bbb"] = 2;
-//     stringset["DD"] = 44;
-//     stringset["EE"] = 9;
-//     stringset["f"] = 99;
-//     stringset["ggg"] = 999;
-//     buildTree();
-//     cout << endl << "----------" << endl;
-//     cout << huffmanCode.at("aaa") << endl;
-//     cout << huffmanCode.at("bbb") << endl;
-//     cout << huffmanCode.at("DD") << endl;
-//     cout << huffmanCode.at("EE") << endl;
-//     cout << huffmanCode.at("f") << endl;
-//     cout << huffmanCode.at("ggg") << endl;
-//     cout << CodeToWord.at("01") << endl;
-//     // cout << CodeToWord.end() << endl;
-//     return 0;
-// }
+int main() {
+    stringset["One  "] = 1;
+    stringset["Two "] = 2;
+    stringset["Forty-Four  "] = 44;
+    stringset["NINE    "] = 9;
+    stringset["99\n    "] = 99;
+    stringset["a thousand minor one"] = 999;
+    buildTree();
+    cout << endl << "----------" << endl;
+    cout << huffmanCode.at("One  ") << endl;
+    cout << huffmanCode.at("Two ") << endl;
+    cout << huffmanCode.at("Forty-Four  ") << endl;
+    cout << huffmanCode.at("NINE    ") << endl;
+    cout << huffmanCode.at("99\n    ") << endl;
+    cout << huffmanCode.at("a thousand minor one") << endl;
+
+    return 0;
+}
