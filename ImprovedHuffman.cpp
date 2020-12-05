@@ -69,7 +69,7 @@ public:
         countRate();
     }
 };
-/////
+
 void Solution::calculatetemp()
 {
 
