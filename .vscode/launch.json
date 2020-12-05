@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) C/C++ Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "internalConsoleOptions": "neverOpen",
+            "linux": {
+                "program": "${fileDirname}/${fileBasenameNoExtension}",
+                "miDebuggerPath": "/usr/bin/gdb"
+            },
+            "windows": {
+                "program": "${fileDirname}/${fileBasenameNoExtension}.exe",
+                "miDebuggerPath": "C:/mingw64/bin/gdb.exe"
+            },
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "C/C++ Build"
+        }
+    ]
+}
