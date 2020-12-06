@@ -58,7 +58,9 @@ public:
     string readFlie(string filePath);
      
      //数据统计模块，用originalStr计算出一二三阶的向前向后转移阈值与转移矩阵（共6个值，6个矩阵需要计算）
-    void Solution::statistics(string txt);
+    void statistics(string txt);
+
+    void writeBinaryFile(string huffcode, string fileToWrite);
   
 
     void judgeRelation()
@@ -161,7 +163,28 @@ void Solution::statistics(string txt)
 	return ;
 }
 
-int main()
+void Solution::writeBinaryFile(string huffcode, string fileToWrite)
+{
+    ofstream outFile(fileToWrite.c_str(), ios::binary | ios::out);  //以二进制写模式打开文件
+    if (!outFile) {
+        cout << "New file open error." << endl;
+        return ;
+    }
+    int wlen = 8;
+    int i;
+    for(i = 0; i < huffcode.length(); i = i + wlen)
+    {
+        char* p = (char*)malloc(wlen*sizeof(char));
+        string sub = huffcode.substr(i, i + wlen);
+        bitset<8> bit(sub);
+        char a = bit.to_ulong(); //这里为0-256
+        outFile.put(a);
+        free(p);
+    }
+    outFile.close();
+}
+
+int main(int argc, char** argv)
 {
     Solution s;
     //s.solve();
