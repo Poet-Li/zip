@@ -6,19 +6,13 @@
 
 using namespace std;
 
-map<string, string> CodeToWord;  //编码到单词的映射
-
-string Strcode;
-string decodeStr;
-
-void encode() {
-    string Coding = Strcode;
+void decode(string StrOf01, string &StrUnzip, map<string, string> CodeToWord) {
     int TempLength = 0;
-    while (!Coding.empty()) {
-        auto iter = CodeToWord.find(Coding.substr(0, TempLength));
+    while (!StrOf01.empty()) {
+        auto iter = CodeToWord.find(StrOf01.substr(0, TempLength));
         if (iter != CodeToWord.end()) {
-            decodeStr += iter->second;
-            Coding.erase(Coding.begin(), Coding.begin() + TempLength);
+            StrUnzip += iter->second;
+            StrOf01.erase(StrOf01.begin(), StrOf01.begin() + TempLength);
             TempLength = 0;
         }
         TempLength++;
