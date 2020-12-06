@@ -33,13 +33,10 @@ public:
     //data
     string originalStr; //初始字符集
     int len;            //字符集长度
+    double compressionRate;
 
-    double forwardtemp1; //一阶向前转移概率阈值
-    double backtemp1;    //一阶向后转移概率阈值
-    double forwardtemp2; //二阶向前转移概率阈值
-    double backtemp2;    //二阶向后转移概率阈值
-    double forwardtemp3; //三阶向前转移概率阈值
-    double backtemp3;    //三阶向后转移概率阈值
+    double forwardtemp[MAX]; //一阶向前转移概率阈值
+    double backtemp[MAX];    //一阶向后转移概率阈值
 
     Matrix p1; //一阶向前转移矩阵
     Matrix n1; //一阶向后转移矩阵
@@ -63,25 +60,11 @@ public:
     void writeBinaryFile(string huffcode, string fileToWrite);
   
 
-    void judgeRelation()
-    {
+    void buildTree(); //由stringset构建哈夫曼树，得到数据huffmanCode
 
-    } //相关性判断模块，由originalStr和转移矩阵构建stringset
+    void encode(); //压缩编码,由huffmanCode得到Strcode
 
-    void bulidTree()
-    {
-
-    } //由stringset构建哈夫曼树，得到数据huffmanCode
-
-    void encode()
-    {
-
-    } //压缩编码,由huffmanCode得到Strcode
-
-    void decode()
-    {
-
-    }//解压缩，由huffmanCode和Strcode得到decodeStr
+    void decode(); //解压缩，由huffmanCode和Strcode得到decodeStr
 
     void countRate(){
         
@@ -89,11 +72,13 @@ public:
 
     // 我个人不建议用这个 不如一个一个函数调用
     /*void solve()
+    void countRate(); //计算压缩率
+    void solve()
     {
         readFlie();
         statistics();
         judgeRelation();
-        bulidTree();
+        buildTree();
         encode();
         decode();
         countRate();
@@ -188,4 +173,20 @@ int main(int argc, char** argv)
 {
     Solution s;
     //s.solve();
+}
+void Solution::calculatetemp()
+{
+
+}
+void Solution::countRate()
+{
+    compressionRate = Strcode.length() / (originalStr.length() * 8);
+    cout << "The compression rate is " << compressionRate << endl;
+}
+void judgeRelation()
+{
+}
+int main()
+{
+    Solution s;
 }

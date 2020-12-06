@@ -1,0 +1,79 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "C/C++ Build",
+            "type": "shell",
+            "command": "g++",
+            "linux": {
+                "args": [
+                    "-g",
+                    "-Wall",
+                    "-std=c++17",
+                    "-lm",
+                    "-static",
+                    "${file}",
+                    "-o",
+                    "${fileDirname}/${fileBasenameNoExtension}"
+                ]
+            },
+            "windows": {
+                "args": [
+                    "-g",
+                    "-Wall",
+                    "-std=c++17",
+                    "-lm",
+                    "-static-libgcc",
+                    "${file}",
+                    "-o",
+                    "${fileDirname}/${fileBasenameNoExtension}.exe"
+                ]
+            },
+            "presentation": {
+                "reveal": "silent",
+                "echo": true,
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            }
+        },
+        {
+            "label": "C/C++ Run",
+            "type": "shell",
+            "dependsOn": "C++ Build",
+            "linux": {
+                "command": "${fileDirname}/${fileBasenameNoExtension}"
+            },
+            "windows": {
+                "command": "${fileDirname}/${fileBasenameNoExtension}.exe"
+            },
+            "args": [],
+            "presentation": {
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            }
+        }
+    ]
+}
