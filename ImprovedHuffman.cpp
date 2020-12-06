@@ -55,7 +55,7 @@ public:
     //func
 
     //将txt文件读入originalStr中
-    string readFlie(string filePath);
+    void readFlie(string filePath);
 
     //数据统计模块，用originalStr计算出一二三阶的向前向后转移阈值与转移矩阵（共6个值，6个矩阵需要计算）
     void statistics(string txt);
@@ -91,9 +91,8 @@ public:
     }*/
 };
 
-string Solution::readFlie(string filePath)
+void Solution::readFlie(string filePath)
 {
-    string ans;
     ifstream infile;
     infile.open(filePath.data());
     assert(infile.is_open());
@@ -103,10 +102,9 @@ string Solution::readFlie(string filePath)
     {
         infile >> c;
         //cout<<c<<endl;
-        ans.push_back(c);
+        originalStr.push_back(c);
     }
     infile.close();
-    return ans;
 }
 
 void Solution::statistics(string txt)
@@ -176,11 +174,6 @@ void Solution::writeBinaryFile(string huffcode, string fileToWrite)
     outFile.close();
 }
 
-int main(int argc, char **argv)
-{
-    Solution s;
-    //s.solve();
-}
 void Solution::calculatetemp1()
 {
     for (int i = 0; i < 128; i++)
@@ -305,7 +298,16 @@ void Solution::countRate()
     compressionRate = Strcode.size() / (originalStr.size() * 8);
     cout << "The compression rate is " << compressionRate << endl;
 }
-int main()
+int main(int argc, char* argv[])
 {
     Solution s;
+    s.readFlie(argv[2]);
+    s.statistics(s.originalStr);
+    s.calculatetempn();
+    s.judgeRelation();
+    s.buildTree();
+    s.encode();
+    s.writeBinaryFile(s.);
+    s.countRate();
+
 }
