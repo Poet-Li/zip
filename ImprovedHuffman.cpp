@@ -389,13 +389,13 @@ void Solution::decode() {
 int main(int argc, char* argv[])
 {
     Solution s;
-    s.readFlie(argv[2]);
+    s.readFlie(argv[1]);
     s.statistics(s.originalStr);
     s.calculatetempn();
     s.judgeRelation();
     s.buildTree();
     s.encode();
-    s.writeBinaryFile(s.);
+    s.writeBinaryFile(s.Strcode, argv[2]);
     s.countRate();
 
 }
