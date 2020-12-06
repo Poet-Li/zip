@@ -1,6 +1,6 @@
 /*
-通过encode()函数即可完成解码
-encode()的三个参数分别为：
+通过decode()函数即可完成解码
+decode()的三个参数分别为：
 
 1.string类型 压缩文件名(二进制文件)   
 如："Huffman.bin"  (要加文件名后缀)    
@@ -25,7 +25,7 @@ encode()的三个参数分别为：
 
 using namespace std;
 
-void encode(string InFileName, string OutFileName,
+void decode(string InFileName, string OutFileName,
             map<string, string> CodeToWord) {
     //如果传入的两个文件名不包括后缀的话，可以统一到这里加上
     // InFileName += ".bat";   //或.bin
