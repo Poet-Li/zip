@@ -1,6 +1,11 @@
-#define MAX 100001
+#define MAX 1001
 #define MAXWINDOW 3
-#include <bits/stdc++.h>
+#define yuzhi 1
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include <map>
+#include <algorithm>
 using namespace std;
 class Matrix
 {
@@ -10,7 +15,7 @@ public:
     {
         memset(val, 0, sizeof(val));
     }
-    Matrix operator*(const Matrix b)
+    Matrix operator*(const Matrix &b)
     {
         Matrix res;
         for (int i = 0; i < 128; i++)
@@ -19,7 +24,7 @@ public:
                     res.val[i][j] = (res.val[i][j] + val[i][u] * b.val[u][j]);
         return res;
     }
-    Matrix operator=(const Matrix b)
+    Matrix operator=(const Matrix &sxedrf)
     {
         Matrix res;
         for (int i = 0; i < 128; i++)
@@ -58,13 +63,13 @@ public:
     string readFlie(string filePath);
 
     //数据统计模块，用originalStr计算出一二三阶的向前向后转移阈值与转移矩阵（共6个值，6个矩阵需要计算）
-    void statistics(string txt);
+    void statistics(string &txt);
 
     void calculatetemp1(); //计算阈值
 
     void calculatetempn(); //计算n阶阈值
 
-    void writeBinaryFile(string huffcode, string fileToWrite);
+    //void writeBinaryFile(string huffcode, string fileToWrite);
 
     void judgeRelation();
 
@@ -91,7 +96,7 @@ public:
     }*/
 };
 
-string Solution::readFlie(string filePath)
+/*string Solution::readFlie(string filePath)
 {
     string ans;
     ifstream infile;
@@ -107,11 +112,11 @@ string Solution::readFlie(string filePath)
     }
     infile.close();
     return ans;
-}
+}*/
 
-void Solution::statistics(string txt)
+void Solution::statistics(string &txt)
 {
-    int len = txt.length();
+    //len = txt.length();
     int count[128];
     double mat[128][128];
     memset(count, 0, sizeof(count));
@@ -150,11 +155,10 @@ void Solution::statistics(string txt)
     p3 = p2 * p1;
     n2 = n1 * n1;
     n3 = n2 * n1;
-
     return;
 }
 
-void Solution::writeBinaryFile(string huffcode, string fileToWrite)
+/*void Solution::writeBinaryFile(string huffcode, string fileToWrite)
 {
     ofstream outFile(fileToWrite.c_str(), ios::binary | ios::out); //以二进制写模式打开文件
     if (!outFile)
@@ -174,13 +178,8 @@ void Solution::writeBinaryFile(string huffcode, string fileToWrite)
         free(p);
     }
     outFile.close();
-}
+}*/
 
-int main(int argc, char **argv)
-{
-    Solution s;
-    //s.solve();
-}
 void Solution::calculatetemp1()
 {
     for (int i = 0; i < 128; i++)
@@ -190,12 +189,15 @@ void Solution::calculatetemp1()
         for (int j = 0; j < 128; j++)
         {
             cnt += p1.val[i][j];
-            m = min(m, p1.val[i][j]);
-            if (cnt >= 0.8)
+            if (p1.val[i][j] > 0)
+                m = min(m, p1.val[i][j]);
+            if (cnt >= yuzhi)
             {
                 break;
             }
         }
+        if (m == MAX)
+            m = 0;
         forwardtemp1[i] = m;
     }
     for (int i = 0; i < 128; i++)
@@ -205,12 +207,15 @@ void Solution::calculatetemp1()
         for (int j = 0; j < 128; j++)
         {
             cnt += n1.val[i][j];
-            m = min(m, n1.val[i][j]);
-            if (cnt >= 0.8)
+            if (n1.val[i][j] > 0)
+                m = min(m, n1.val[i][j]);
+            if (cnt >= yuzhi)
             {
                 break;
             }
         }
+        if (m == MAX)
+            m = 0;
         backtemp1[i] = m;
     }
 }
@@ -225,7 +230,20 @@ void Solution::calculatetempn()
         for (; j < 128 && j - i <= 3; j++)
         {
             forwardtempn[i][j - i] = ans;
-            ans *= forwardtemp1[j];
+            k = originalStr[j];
+            ans *= forwardtemp1[k];
+        }
+    }
+    for (int i = 0; i < originalStr.size(); i++)
+    {
+        int k = originalStr[i];
+        double ans = backtemp1[k];
+        int j = i + 1;
+        for (; j < 128 && j - i <= 3; j++)
+        {
+            backtempn[i][j - i] = ans;
+            k = originalStr[j];
+            ans *= backtemp1[k];
         }
     }
 }
@@ -237,18 +255,19 @@ void Solution::judgeRelation()
     int flag = 0;
     calculatetemp1();
     calculatetempn();
-    while (posi < len - 3)
+    while (posi < len)
     {
-        for (int i = posi; i < MAXWINDOW; i++)
+        step = 1;
+        for (int i = posi; i < MAXWINDOW + posi; i++)
         {
             if (p1.val[i][i + step] >= forwardtemp1[i] && n1.val[i][i + step] >= backtemp1[i])
             {
-                flag = i;
+                flag = i + step;
                 continue;
             }
             else
             {
-                flag = i - 1;
+                flag = i;
                 break;
             }
         }
@@ -305,7 +324,15 @@ void Solution::countRate()
     compressionRate = Strcode.size() / (originalStr.size() * 8);
     cout << "The compression rate is " << compressionRate << endl;
 }
-int main()
+
+int main(int argc, char **argv)
 {
     Solution s;
+    string st = "";
+    s.originalStr = st;
+    s.len = st.length();
+    s.statistics(st);
+    s.judgeRelation();
+    cout << "ssb" << endl;
+    //s.solve();
 }
