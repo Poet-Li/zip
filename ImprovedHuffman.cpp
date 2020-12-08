@@ -1,15 +1,11 @@
 #define MAX 1001
 #define MAXWINDOW 3
 #define yuzhi 1
-#include <algorithm>
-#include <cstring>
-#include <iostream>
-#include <map>
-#include <vector>
 #define Longest 4  //最长的字符字串的长度
 #include <bits/stdc++.h>
-typedef pair<string, int> node;
 using namespace std;
+typedef pair<string, int> node;
+
 class Matrix {
    public:
     double val[128][128];
@@ -22,10 +18,10 @@ class Matrix {
                     res.val[i][j] = (res.val[i][j] + val[i][u] * b.val[u][j]);
         return res;
     }
-    Matrix operator=(const Matrix &sxedrf) {
+    Matrix operator=(const Matrix &b) {
         Matrix res;
         for (int i = 0; i < 128; i++)
-            for (int j = 0; j < 128; j++) res.val[i][j] = val[i][j];
+            for (int j = 0; j < 128; j++) res.val[i][j] = b.val[i][j];
         return res;
     }
 };
@@ -53,8 +49,7 @@ class Solution {
 
     double forwardtemp1[MAX];  //一阶向前转移概率阈值
     double backtemp1[MAX];     //一阶向后转移概率阈值
-    double forwardtempn[MAX]
-                       [5];  //多阶向前转移概率阈值，根据具体的字符串计算得到
+    double forwardtempn[MAX][5];  //多阶向前转移概率阈值，根据具体的字符串计算得到
     double backtempn[MAX][5];  //多阶向后转移概率阈值
 
     Matrix p1;  //一阶向前转移矩阵
@@ -83,7 +78,7 @@ class Solution {
 
     void calculatetempn();  //计算n阶阈值
 
-    void writeBinaryFile(string huffcode, string fileToWrite);
+    void writeBinaryFile(string filePath);		// 把字符串写进txt文件中
 
     void judgeRelation();
 
@@ -97,23 +92,8 @@ class Solution {
     void decode();  //解压缩，由huffmanCode和Strcode得到decodeStr
 
     void countRate();  //计算压缩率
-
-    // 我个人不建议用这个 不如一个一个函数调用
-    /*void solve()
-    void countRate(); //计算压缩率
-    void solve()
-    {
-        readFlie();
-        statistics();
-        judgeRelation();
-        buildTree();
-        encode();
-        decode();
-        countRate();
-    }*/
 };
 
-/*string Solution::readFlie(string filePath)
 void Solution::readFlie(string filePath)
 {
     ifstream infile;
@@ -128,11 +108,10 @@ void Solution::readFlie(string filePath)
         originalStr.push_back(c);
     }
     infile.close();
-    return ans;
-}*/
+}
 
 void Solution::statistics(string &txt) {
-    // len = txt.length();
+    len = txt.length();
     int count[128];
     double mat[128][128];
     memset(count, 0, sizeof(count));
@@ -169,23 +148,37 @@ void Solution::statistics(string &txt) {
     return;
 }
 
-void Solution::writeBinaryFile(string huffcode, string fileToWrite) {
+void Solution::writeBinaryFile(string fileToWrite) {
     ofstream outFile(fileToWrite.c_str(),
                      ios::binary | ios::out);  //以二进制写模式打开文件
     if (!outFile) {
         cout << "New file open error." << endl;
         return;
     }
+
+	//得到StrOf01部分
+    int temp = 0;
+    while (Str_File_Connected.at(temp) != '\a') temp++;
+    string huffcode = Str_File_Connected.substr(0, temp);
+    string hufftable = Str_File_Connected.substr(temp + 1, Str_File_Connected.length() - temp);
+
     int wlen = 8;
     int i;
     for (i = 0; i < huffcode.length(); i = i + wlen) {
-        char *p = (char *)malloc(wlen * sizeof(char));
         string sub = huffcode.substr(i, i + wlen);
         bitset<8> bit(sub);
         char a = bit.to_ulong();  //这里为0-256
         outFile.put(a);
-        free(p);
     }
+	i -= wlen;
+	string sub = huffcode.substr(i + 1, huffcode.length() - i);
+	bitset<8> bit(sub);
+	char a = bit.to_ulong();  //这里为0-256
+	outFile.put(a);
+	for(i = 0; i < hufftable.length(); i++)
+	{
+		outFile.put(hufftable[i]);
+	}
     outFile.close();
 }
 
@@ -304,6 +297,17 @@ void Solution::countRate() {
     compressionRate = Strcode.size() / (originalStr.size() * 8);
     cout << "The compression rate is " << compressionRate << endl;
 }
+
+void Solution::getHuffmanCode(TreeNode *treenode, string code) {
+    treenode->huffcode = code;
+    if (treenode->left != NULL) getHuffmanCode(treenode->left, code + "0");
+    if (treenode->right != NULL) getHuffmanCode(treenode->right, code + "1");
+    if ((treenode->right == NULL) && (treenode->left == NULL)) {
+        huffmanCode[treenode->Node.first] = treenode->huffcode;
+        CodeToWord[treenode->huffcode] = treenode->Node.first;
+    }
+}
+
 void Solution::buildTree() {
     //由stringset构建哈夫曼树，然后调用getHuffmanCode()
     vector<node> Vec(stringset.begin(), stringset.end());
@@ -311,8 +315,8 @@ void Solution::buildTree() {
     priority_queue<TreeNode *, vector<TreeNode *>, compare> Queue;
     for (int i = 0; i < KeyNumber; i++) {
         TreeNode *tempnode = new TreeNode();
-        tempnode->left = nullptr;
-        tempnode->right = nullptr;
+        tempnode->left = NULL;
+        tempnode->right = NULL;
         tempnode->Node = Vec.back();
         Vec.pop_back();
         Queue.push(tempnode);
@@ -341,12 +345,12 @@ void Solution::buildTree() {
     delete node2;
 }
 
-void Solution::encode() {  //如果字符字串有/t开头的可能会出问题？
+void Solution::encode() {   //如果字符字串有/t开头的可能会出问题？
     int TempLength = Longest;
     //设置一个TempLength变量，初始为最长长度，每次先检测当前字符串头的前TempLength个字符
     //之和，看看是不是map中对应的一个单词
     while (Strcode.length() > Longest) {
-        auto iter = huffmanCode.find(Strcode.substr(0, TempLength));
+        map<string, string>::iterator iter = huffmanCode.find(Strcode.substr(0, TempLength));
         if (iter != huffmanCode.end()) {
             StrOf01 += iter->second;
             Strcode.erase(Strcode.begin(), Strcode.begin() + TempLength);
@@ -355,7 +359,7 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
         TempLength--;
     }
     string s;  //储存map部分
-    for (auto iter = CodeToWord.begin(); iter != CodeToWord.end(); iter++) {
+    for (map<string, string>::iterator iter = CodeToWord.begin(); iter != CodeToWord.end(); iter++) {
         s += "\a";
         s += iter->first;
         s += "\a";
@@ -400,7 +404,7 @@ void Solution::decode() {
     int TempLength = 0;
     Str_File_Connected.clear();
     while (!StrOf01.empty()) {
-        auto iter = CodeToWord.find(StrOf01.substr(0, TempLength));
+        map<string, string>::iterator iter = CodeToWord.find(StrOf01.substr(0, TempLength));
         if (iter != CodeToWord.end()) {
             Str_File_Connected += iter->second;
             StrOf01.erase(StrOf01.begin(), StrOf01.begin() + TempLength);
@@ -410,24 +414,30 @@ void Solution::decode() {
     }
 }
 
-void Solution::getHuffmanCode(TreeNode *treenode, string code) {
-    treenode->huffcode = code;
-    if (treenode->left != nullptr) getHuffmanCode(treenode->left, code + "0");
-    if (treenode->right != nullptr) getHuffmanCode(treenode->right, code + "1");
-    if ((treenode->right == nullptr) && (treenode->left == nullptr)) {
-        huffmanCode[treenode->Node.first] = treenode->huffcode;
-        CodeToWord[treenode->huffcode] = treenode->Node.first;
-    }
-}
-
 int main(int argc, char *argv[]) {
     Solution s;
-    s.readFlie(argv[1]);
+    //s.readFlie(argv[2]);
+	s.readFlie("src.txt");
+	cout<<1<<endl;
     s.statistics(s.originalStr);
+	// for(int i = 0; i < 128; i++)
+	// {
+	// 	for(int j = 0; j < 128; j++)
+	// 	{
+	// 		if(s.p1.val[i][j] != 0)	cout<<"i: "<<i<<" j: "<<j<<" val: "<<s.p1.val[i][j]<<endl;
+	// 		if(s.n2.val[i][j] != 0)	cout<<"i: "<<i<<" j: "<<j<<" val: "<<s.n2.val[i][j]<<endl;
+	// 	}
+	// }
+	cout<<2<<endl;
     s.calculatetempn();
+	cout<<3<<endl;
     s.judgeRelation();
+	cout<<4<<endl;
     s.buildTree();
+	cout<<5<<endl;
     s.encode();
-    s.writeBinaryFile(s.Strcode, argv[2]);
+	cout<<6<<endl;
+    s.writeBinaryFile(argv[3]);
+	cout<<7<<endl;
     s.countRate();
 }
