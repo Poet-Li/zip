@@ -80,6 +80,7 @@ public:
     map<string, string> CodeToWord;  //编码到字符字串的映射
     string Strcode;                  //整个字符串对应的编码集
     string StrOf01;                  //用字符串存的01串嗷
+	string huffTable;				 //映射表
 
     string Str_File_Connected; //治达用这个string来做文件操作就行
     // func
@@ -192,7 +193,7 @@ void Solution::writeBinaryFile(string fileToWrite)
     int i;
     for (i = 0; i < huffcode.length(); i = i + wlen)
     {
-        string sub = huffcode.substr(i, i + wlen);
+        string sub = huffcode.substr(i, wlen);
         bitset<8> bit(sub);
         char a = bit.to_ulong(); //这里为0-256
         outFile.put(a);
@@ -437,17 +438,17 @@ void Solution::encode()
         }
         TempLength--;
     }
-    string s; //储存map部分
+    string huffTable; //储存map部分
     for (map<string, string>::iterator iter = CodeToWord.begin(); iter != CodeToWord.end(); iter++)
     {
-        s += "\a";
-        s += iter->first;
-        s += "\a";
-        s += iter->second;
+        huffTable += "\a";
+        huffTable += iter->first;
+        huffTable += "\a";
+        huffTable += iter->second;
     }
-    s += "\a";
-    s += "\t";
-    Str_File_Connected = StrOf01 + s;
+    huffTable += "\a";
+    huffTable += "\t";
+    Str_File_Connected = StrOf01 + huffTable;
 }
 
 void Solution::decode()
@@ -505,7 +506,7 @@ int main(int argc, char *argv[])
 {
     Solution s;
     //s.readFlie(argv[2]);
-    s.readFlie("txt01.txt");
+    s.readFlie("src.txt");
     cout << 1 << endl;
     s.statistics(s.originalStr);
     // for(int i = 0; i < 128; i++)
