@@ -414,6 +414,7 @@ void Solution::decode() {
     }
 }
 
+<<<<<<< Updated upstream
 // int main(int argc, char *argv[]) {
 //     Solution s;
 //     //s.readFlie(argv[2]);
@@ -441,3 +442,16 @@ void Solution::decode() {
 // 	cout<<7<<endl;
 //     s.countRate();
 // }
+=======
+int main(int argc, char *argv[]) {
+    Solution s;
+    s.readFlie(argv[2]);
+    s.statistics(s.originalStr);
+    s.calculatetempn();
+    s.judgeRelation();
+    s.buildTree();
+    s.encode();
+    s.writeBinaryFile(s.Strcode, argv[3]);
+    s.countRate();
+}
+>>>>>>> Stashed changes
