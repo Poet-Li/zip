@@ -414,30 +414,30 @@ void Solution::decode() {
     }
 }
 
-// int main(int argc, char *argv[]) {
-//     Solution s;
-//     //s.readFlie(argv[2]);
-// 	s.readFlie("src.txt");
-// 	cout<<1<<endl;
-//     s.statistics(s.originalStr);
-// 	// for(int i = 0; i < 128; i++)
-// 	// {
-// 	// 	for(int j = 0; j < 128; j++)
-// 	// 	{
-// 	// 		if(s.p1.val[i][j] != 0)	cout<<"i: "<<i<<" j: "<<j<<" val: "<<s.p1.val[i][j]<<endl;
-// 	// 		if(s.n2.val[i][j] != 0)	cout<<"i: "<<i<<" j: "<<j<<" val: "<<s.n2.val[i][j]<<endl;
-// 	// 	}
-// 	// }
-// 	cout<<2<<endl;
-//     s.calculatetempn();
-// 	cout<<3<<endl;
-//     s.judgeRelation();
-// 	cout<<4<<endl;
-//     s.buildTree();
-// 	cout<<5<<endl;
-//     s.encode();
-// 	cout<<6<<endl;
-//     s.writeBinaryFile(argv[3]);
-// 	cout<<7<<endl;
-//     s.countRate();
-// }
+int main(int argc, char *argv[]) {
+    Solution s;
+    //s.readFlie(argv[2]);
+	s.readFlie("txt01.txt");
+	cout<<1<<endl;
+    s.statistics(s.originalStr);
+	// for(int i = 0; i < 128; i++)
+	// {
+	// 	for(int j = 0; j < 128; j++)
+	// 	{
+	// 		if(s.p1.val[i][j] != 0)	cout<<"i: "<<i<<" j: "<<j<<" val: "<<s.p1.val[i][j]<<endl;
+	// 		if(s.n2.val[i][j] != 0)	cout<<"i: "<<i<<" j: "<<j<<" val: "<<s.n2.val[i][j]<<endl;
+	// 	}
+	// }
+	cout<<2<<endl;
+    s.calculatetempn();
+	cout<<3<<endl;
+    s.judgeRelation();
+	cout<<4<<endl;
+    s.buildTree();
+	cout<<5<<endl;
+    s.encode();
+	cout<<6<<endl;
+    s.writeBinaryFile(argv[3]);
+	cout<<7<<endl;
+    s.countRate();
+}
