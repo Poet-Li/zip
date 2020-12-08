@@ -341,7 +341,7 @@ void Solution::buildTree() {
     delete node2;
 }
 
-void Solution::encode() {   //如果字符字串有/t开头的可能会出问题？
+void Solution::encode() {  //如果字符字串有/t开头的可能会出问题？
     int TempLength = Longest;
     //设置一个TempLength变量，初始为最长长度，每次先检测当前字符串头的前TempLength个字符
     //之和，看看是不是map中对应的一个单词
@@ -407,6 +407,16 @@ void Solution::decode() {
             TempLength = 0;
         }
         TempLength++;
+    }
+}
+
+void Solution::getHuffmanCode(TreeNode *treenode, string code) {
+    treenode->huffcode = code;
+    if (treenode->left != nullptr) getHuffmanCode(treenode->left, code + "0");
+    if (treenode->right != nullptr) getHuffmanCode(treenode->right, code + "1");
+    if ((treenode->right == nullptr) && (treenode->left == nullptr)) {
+        huffmanCode[treenode->Node.first] = treenode->huffcode;
+        CodeToWord[treenode->huffcode] = treenode->Node.first;
     }
 }
 
