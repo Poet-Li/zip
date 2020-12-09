@@ -375,7 +375,7 @@ void Solution::judgeRelation()
 }
 void Solution::countRate()
 {
-    double a = StrOf01.size();
+    double a = StrOf01.size() + huffTable.size();
     double b = len;
     compressionRate = a / len/8;
     cout << a << endl
@@ -461,7 +461,7 @@ void Solution::encode()
         }
     }
     cout << "test" << endl;
-    string huffTable; //储存map部分
+    // string huffTable; //储存map部分
     for (map<string, string>::iterator iter = CodeToWord.begin();
          iter != CodeToWord.end(); iter++)
     {
