@@ -22,8 +22,8 @@ class Matrix {
         Matrix res;
         for (int i = 0; i < 128; i++)
             for (int j = 0; j < 128; j++)
-                for (int u = 0; u < 128; u++)
-                        res.val[i][j] = (res.val[i][j] + val[i][u] * b.val[u][j]);
+                for (int u = 0; u < 128 ; u++)
+                        res.val[i][j] = (res.val[i][j] + val[i][u] * b.val[u][j]);
         return res;
     }
     void operator=(const Matrix &b)
