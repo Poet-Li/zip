@@ -459,20 +459,42 @@ void Solution::encode()
             continue;
         }
         TempLength--;
-        if (TempLength == 0)
-        {
-            cout << "fxxk" << endl;
-        }
+        // if (TempLength == 0)
+        // {
+        //     cout << "fxxk" << endl;
+        // }
     }
-    cout << "test" << endl;
-    // string huffTable; //储存map部分
+    //cout << "test" << endl;
+    //储存map部分
     for (map<string, string>::iterator iter = CodeToWord.begin();
          iter != CodeToWord.end(); iter++)
     {
         huffTable += "\a";
-        huffTable += iter->first;
+        //huffTable += iter->first;
+        string s01 = iter->first;
+        string sub;
+        if(s01.length() <= 8)
+        {
+            bitset<8> bit(s01);
+            char a = bit.to_ulong(); //这里为0-256
+            huffTable += a;
+        }
+
+        if(s01.length() > 8)
+        {
+            sub = s01.substr(0, 8);
+            bitset<8> bit(sub);
+            char a = bit.to_ulong(); //这里为0-256
+            huffTable += a;
+
+            sub = s01.substr(9, s01.length() - 8);
+            bitset<8> bit1(sub);
+            a = bit1.to_ulong(); //这里为0-256
+            huffTable += a;
+        }
         huffTable += "\a";
         huffTable += iter->second;
+
     }
     huffTable += "\a";
     huffTable += "\t";
