@@ -1,6 +1,6 @@
 #define MAX 3001
 #define MAXWINDOW 3
-#define yuzhi 0.8
+#define yuzhi 0.5
 #define Longest 4 //最长的字符字串的长度
 #include <algorithm>
 #include <bitset>
@@ -284,64 +284,50 @@ void Solution::judgeRelation()
     int cnt = 0;
     int flag = 0;
     calculatetemp1();
-    for (int i = 32; i < 128; i++)
+    for (int i = 0; i < 128; i++)
     {
         char k = i;
         string s(1, k);
         stringset.insert(map<string, int>::value_type(s, 0));
     }
     while (posi < len)
-    {
-        step = 1;
-        for (int i = posi; i < MAXWINDOW + posi; i++)
+    {   
+        
+        string s = originalStr.substr(posi, 1);
+        if (len > 10000)
         {
-            int p = originalStr[i];
-            int w = originalStr[i + step];
-            if (p1.val[p][w] > forwardtemp1[i] &&
-                n1.val[p][w] > backtemp1[i])
+            step = 1;
+            for (int i = posi; i < MAXWINDOW + posi; i++)
             {
-                flag = i + step;
-                continue;
-            }
-            else
-            {
-                flag = i;
-                break;
-            }
-        }
-
-        //一阶已经完成
-        step = posi + 2;
-        // flag是滑动窗口的右边界
-        if (flag - posi > 1) //零阶直接跳出
-        {
-            int l = flag;
-            for (int j = step; j <= l; j++)
-            {
-                if (j - posi == 2)
+                int p = originalStr[i];
+                int w = originalStr[i + step];
+                if (p1.val[p][w] > forwardtemp1[i] &&
+                    n1.val[p][w] > backtemp1[i])
                 {
-                    int p = originalStr[posi];
-                    int b = originalStr[posi + 2];
-                    if (p2.val[p][b] > getforwardtempn(posi, 2) &&
-                        n2.val[p][b] > getbackwardtempn(posi, 2))
-                    {
-                        flag = j;
-                        continue;
-                    }
-                    else
-                    {
-                        flag = j - 1;
-                        break;
-                    }
+                    flag = i + step;
+                    continue;
                 }
-                else if (j - posi == 3)
+                else
                 {
-                    step = posi + 3;
+                    flag = i;
+                    break;
+                }
+            }
+
+            //一阶已经完成
+            step = posi + 2;
+            // flag是滑动窗口的右边界
+            if (flag - posi > 1) //零阶直接跳出
+            {
+                int l = flag;
+                for (int j = step; j <= l; j++)
+                {
+                    if (j - posi == 2)
                     {
                         int p = originalStr[posi];
-                        int b = originalStr[posi + 3];
-                        if (p3.val[p][b] > getforwardtempn(posi, 3) &&
-                            n3.val[p][b] > getbackwardtempn(posi, 3))
+                        int b = originalStr[posi + 2];
+                        if (p2.val[p][b] > getforwardtempn(posi, 2) &&
+                            n2.val[p][b] > getbackwardtempn(posi, 2))
                         {
                             flag = j;
                             continue;
@@ -352,11 +338,30 @@ void Solution::judgeRelation()
                             break;
                         }
                     }
+                    else if (j - posi == 3)
+                    {
+                        step = posi + 3;
+                        {
+                            int p = originalStr[posi];
+                            int b = originalStr[posi + 3];
+                            if (p3.val[p][b] > getforwardtempn(posi, 3) &&
+                                n3.val[p][b] > getbackwardtempn(posi, 3))
+                            {
+                                flag = j;
+                                continue;
+                            }
+                            else
+                            {
+                                flag = j - 1;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
+            s = originalStr.substr(posi, flag + 1 - posi);
         }
-        string s = originalStr.substr(posi, flag + 1 - posi);
-
+        
         pair<map<string, int>::iterator, bool> Insert_Pair;
 
         Insert_Pair = stringset.insert(map<string, int>::value_type(s, 1));
@@ -530,7 +535,7 @@ int main(int argc, char *argv[])
 {
     Solution s;
     // s.readFlie(argv[2]);
-    s.readFlie("txt02.txt");
+    s.readFlie("txt01.txt");
     cout << 1 << endl;
     s.statistics(s.originalStr);
     // for(int i = 0; i < 128; i++)
