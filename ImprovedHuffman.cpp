@@ -370,13 +370,17 @@ void Solution::judgeRelation()
         cnt++;
         cout << posi << endl;
     }
-    
+
     cout << cnt << endl;
 }
 void Solution::countRate()
 {
-    // compressionRate = StrOf01.size() / (originalStr.size() * 8);
-    // cout << "The compression rate is " << compressionRate << endl;
+    double a = StrOf01.size();
+    double b = len;
+    compressionRate = a / len/8;
+    cout << a << endl
+         << b << endl;
+    cout << "The compression rate is " << compressionRate << endl;
 }
 
 void Solution::getHuffmanCode(TreeNode *treenode, string code)
