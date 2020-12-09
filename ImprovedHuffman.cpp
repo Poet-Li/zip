@@ -1,6 +1,6 @@
-#define MAX 1001
+#define MAX 3001
 #define MAXWINDOW 3
-#define yuzhi 0.8
+#define yuzhi 0.5
 #define Longest 4 //最长的字符字串的长度
 #include <algorithm>
 #include <bitset>
@@ -28,6 +28,7 @@ public:
                 {
                     res.val[i][j] = (res.val[i][j] + val[i][k] * b.val[k][j]);
                 }
+        return res;
     }
     void operator=(const Matrix &b)
     {
@@ -66,6 +67,7 @@ public:
     double backtemp1[MAX];       //一阶向后转移概率阈值
     double forwardtempn[MAX][5]; //多阶向前转移概率阈值，根据具体的字符串计算得到
     double backtempn[MAX][5];    //多阶向后转移概率阈值
+    //用时间换空间！！！
 
     Matrix p1; //一阶向前转移矩阵
     Matrix n1; //一阶向后转移矩阵
@@ -92,7 +94,9 @@ public:
 
     void calculatetemp1(); //计算阈值
 
-    void calculatetempn(); //计算n阶阈值
+    double getforwardtempn(int str, int sq);
+
+    double getbackwardtempn(int str, int sq);
 
     void writeBinaryFile(string filePath); // 把字符串写进txt文件中
 
@@ -250,43 +254,37 @@ void Solution::calculatetemp1()
     }
 }
 
-void Solution::calculatetempn()
+inline double Solution::getforwardtempn(int str, int sq)
 {
-    for (int i = 0; i < originalStr.size(); i++)
+    int c = originalStr[str];
+    double ans = forwardtemp1[c];
+    for (int i = str + 1; i <= str + sq; i++)
     {
-        int k = originalStr[i];
-        double ans = forwardtemp1[k];
-        int j = i + 1;
-        for (; j < 128 && j - i <= 3; j++)
-        {
-            forwardtempn[i][j - i] = ans;
-            k = originalStr[j];
-            ans *= forwardtemp1[k];
-        }
+        c = originalStr[i];
+        ans *= forwardtemp1[c];
     }
-    for (int i = 0; i < originalStr.size(); i++)
+    return ans;
+}
+
+inline double Solution::getbackwardtempn(int str, int sq)
+{
+    int c = originalStr[str];
+    double ans = backtemp1[c];
+    for (int i = str + 1; i <= str + sq; i++)
     {
-        int k = originalStr[i];
-        double ans = backtemp1[k];
-        int j = i + 1;
-        for (; j < 128 && j - i <= 3; j++)
-        {
-            backtempn[i][j - i] = ans;
-            k = originalStr[j];
-            ans *= backtemp1[k];
-        }
+        c = originalStr[i];
+        ans *= backtemp1[c];
     }
+    return ans;
 }
 
 void Solution::judgeRelation()
 {
     int posi = 0;
     int step;
-    int cnt = 0;
     int flag = 0;
     calculatetemp1();
-    calculatetempn();
-    for (int i = 32; i < 128; i++)
+    for (int i = 0; i < 128; i++)
     {
         char k = i;
         string s(1, k);
@@ -294,55 +292,38 @@ void Solution::judgeRelation()
     }
     while (posi < len)
     {
-        step = 1;
-        for (int i = posi; i < MAXWINDOW + posi; i++)
-        {
-            int p = originalStr[i];
-            int w = originalStr[i + step];
-            if (p1.val[p][w] > forwardtemp1[i] &&
-                n1.val[p][w] > backtemp1[i])
+            step = 1;
+            for (int i = posi; i < MAXWINDOW + posi; i++)
             {
-                flag = i + step;
-                continue;
-            }
-            else
-            {
-                flag = i;
-                break;
-            }
-        }
-
-        //一阶已经完成
-        step = posi + 2;
-        // flag是滑动窗口的右边界
-        if (flag - posi > 1) //零阶直接跳出
-        {
-            int l = flag;
-            for (int j = step; j <= l; j++)
-            {
-                if (j - posi == 2)
+                int p = originalStr[i];
+                int w = originalStr[i + step];
+                if (p1.val[p][w] > forwardtemp1[p] &&
+                    n1.val[p][w] > backtemp1[p])
                 {
-                    int p = originalStr[posi];
-                    int b = originalStr[j + posi];
-                    if (p2.val[p][b] > forwardtempn[posi][j - posi] &&
-                        n2.val[p][b] > backtempn[posi][j - posi])
-                    {
-                        flag = j;
-                        continue;
-                    }
-                    else
-                    {
-                        flag = j - 1;
-                        break;
-                    }
+                    flag = i + step;
+                    continue;
                 }
-                else if (j - posi == 3)
+                else
                 {
+                    flag = i;
+                    break;
+                }
+            }
+
+            //一阶已经完成
+            step = posi + 2;
+            // flag是滑动窗口的右边界
+            if (flag - posi > 1) //零阶直接跳出
+            {
+                int l = flag;
+                for (int j = step; j <= l; j++)
+                {
+                    if (j - posi == 2)
                     {
                         int p = originalStr[posi];
-                        int b = originalStr[j + posi];
-                        if (p3.val[p][b] > forwardtempn[posi][j - posi] &&
-                            n3.val[p][b] > backtempn[posi][j - posi])
+                        int b = originalStr[posi + 2];
+                        if (p2.val[p][b] > getforwardtempn(posi, 2) &&
+                            n2.val[p][b] > getbackwardtempn(posi, 2))
                         {
                             flag = j;
                             continue;
@@ -353,31 +334,47 @@ void Solution::judgeRelation()
                             break;
                         }
                     }
+                    else if (j - posi == 3)
+                    {
+                        step = posi + 3;
+                        {
+                            int p = originalStr[posi];
+                            int b = originalStr[posi + 3];
+                            if (p3.val[p][b] > getforwardtempn(posi, 3) &&
+                                n3.val[p][b] > getbackwardtempn(posi, 3))
+                            {
+                                flag = j;
+                                continue;
+                            }
+                            else
+                            {
+                                flag = j - 1;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
-        }
-        string s = originalStr.substr(posi, flag + 1 - posi);
+            string s = originalStr.substr(posi, flag + 1 - posi);
 
-        pair<map<string, int>::iterator, bool> Insert_Pair;
+            pair<map<string, int>::iterator, bool> Insert_Pair;
 
-        Insert_Pair = stringset.insert(map<string, int>::value_type(s, 1));
+            Insert_Pair = stringset.insert(map<string, int>::value_type(s, 1));
 
-        if (!Insert_Pair.second)
-        {
-            stringset[s]++;
-        }
-        posi += s.size();
-        cnt++;
-        cout << posi << endl;
+            if (!Insert_Pair.second)
+            {
+                stringset[s]++;
+            }
+            posi += s.size();
+        //cout << posi << endl;
     }
-
-    cout << cnt << endl;
+    //cout << cnt << endl;
 }
 void Solution::countRate()
 {
     double a = StrOf01.size() + huffTable.size();
     double b = len;
-    compressionRate = a / len/8;
+    compressionRate = a / len / 8;
     cout << a << endl
          << b << endl;
     cout << "The compression rate is " << compressionRate << endl;
@@ -455,18 +452,39 @@ void Solution::encode()
             continue;
         }
         TempLength--;
-        if (TempLength == 0)
-        {
-            cout << "fxxk" << endl;
-        }
+        // if (TempLength == 0)
+        // {
+        //     cout << "fxxk" << endl;
+        // }
     }
-    cout << "test" << endl;
-    // string huffTable; //储存map部分
+    //cout << "test" << endl;
+    //储存map部分
     for (map<string, string>::iterator iter = CodeToWord.begin();
          iter != CodeToWord.end(); iter++)
     {
         huffTable += "\a";
-        huffTable += iter->first;
+        //huffTable += iter->first;
+        string s01 = iter->first;
+        string sub;
+        if (s01.length() <= 8)
+        {
+            bitset<8> bit(s01);
+            char a = bit.to_ulong(); //这里为0-256
+            huffTable += a;
+        }
+
+        if (s01.length() > 8)
+        {
+            sub = s01.substr(0, 8);
+            bitset<8> bit(sub);
+            char a = bit.to_ulong(); //这里为0-256
+            huffTable += a;
+
+            sub = s01.substr(9, s01.length() - 8);
+            bitset<8> bit1(sub);
+            a = bit1.to_ulong(); //这里为0-256
+            huffTable += a;
+        }
         huffTable += "\a";
         huffTable += iter->second;
     }
@@ -546,15 +564,13 @@ int main(int argc, char *argv[])
     // 	}
     // }
     cout << 2 << endl;
-    s.calculatetempn();
-    cout << 3 << endl;
     s.judgeRelation();
-    cout << 4 << endl;
+    cout << 3 << endl;
     s.buildTree();
-    cout << 5 << endl;
+    cout << 4 << endl;
     s.encode();
-    cout << 6 << endl;
+    cout << 5 << endl;
     s.writeBinaryFile("out.txt");
-    cout << 7 << endl;
+    cout << 6 << endl;
     s.countRate();
 }
