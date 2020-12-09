@@ -1,4 +1,4 @@
-#define MAX 1001
+#define MAX 3001
 #define MAXWINDOW 3
 #define yuzhi 0.8
 #define Longest 4 //最长的字符字串的长度
@@ -66,6 +66,7 @@ public:
     double backtemp1[MAX];       //一阶向后转移概率阈值
     double forwardtempn[MAX][5]; //多阶向前转移概率阈值，根据具体的字符串计算得到
     double backtempn[MAX][5];    //多阶向后转移概率阈值
+    //用时间换空间！！！
 
     Matrix p1; //一阶向前转移矩阵
     Matrix n1; //一阶向后转移矩阵
@@ -92,7 +93,9 @@ public:
 
     void calculatetemp1(); //计算阈值
 
-    void calculatetempn(); //计算n阶阈值
+    double getforwardtempn(int str, int sq);
+
+    double getbackwardtempn(int str, int sq);
 
     void writeBinaryFile(string filePath); // 把字符串写进txt文件中
 
@@ -250,32 +253,28 @@ void Solution::calculatetemp1()
     }
 }
 
-void Solution::calculatetempn()
+inline double Solution::getforwardtempn(int str, int sq)
 {
-    for (int i = 0; i < originalStr.size(); i++)
+    int c = originalStr[str];
+    double ans = forwardtemp1[c];
+    for (int i = str + 1; i <= str + sq; i++)
     {
-        int k = originalStr[i];
-        double ans = forwardtemp1[k];
-        int j = i + 1;
-        for (; j < 128 && j - i <= 3; j++)
-        {
-            forwardtempn[i][j - i] = ans;
-            k = originalStr[j];
-            ans *= forwardtemp1[k];
-        }
+        c = originalStr[i];
+        ans *= forwardtemp1[c];
     }
-    for (int i = 0; i < originalStr.size(); i++)
+    return ans;
+}
+
+inline double Solution::getbackwardtempn(int str, int sq)
+{
+    int c = originalStr[str];
+    double ans = backtemp1[c];
+    for (int i = str + 1; i <= str + sq; i++)
     {
-        int k = originalStr[i];
-        double ans = backtemp1[k];
-        int j = i + 1;
-        for (; j < 128 && j - i <= 3; j++)
-        {
-            backtempn[i][j - i] = ans;
-            k = originalStr[j];
-            ans *= backtemp1[k];
-        }
+        c = originalStr[i];
+        ans *= backtemp1[c];
     }
+    return ans;
 }
 
 void Solution::judgeRelation()
@@ -285,7 +284,6 @@ void Solution::judgeRelation()
     int cnt = 0;
     int flag = 0;
     calculatetemp1();
-    calculatetempn();
     for (int i = 32; i < 128; i++)
     {
         char k = i;
@@ -323,9 +321,9 @@ void Solution::judgeRelation()
                 if (j - posi == 2)
                 {
                     int p = originalStr[posi];
-                    int b = originalStr[j + posi];
-                    if (p2.val[p][b] > forwardtempn[posi][j - posi] &&
-                        n2.val[p][b] > backtempn[posi][j - posi])
+                    int b = originalStr[posi + 2];
+                    if (p2.val[p][b] > getforwardtempn(posi, 2) &&
+                        n2.val[p][b] > getbackwardtempn(posi, 2))
                     {
                         flag = j;
                         continue;
@@ -338,11 +336,12 @@ void Solution::judgeRelation()
                 }
                 else if (j - posi == 3)
                 {
+                    step = posi + 3;
                     {
                         int p = originalStr[posi];
-                        int b = originalStr[j + posi];
-                        if (p3.val[p][b] > forwardtempn[posi][j - posi] &&
-                            n3.val[p][b] > backtempn[posi][j - posi])
+                        int b = originalStr[posi + 3];
+                        if (p3.val[p][b] > getforwardtempn(posi, 3) &&
+                            n3.val[p][b] > getbackwardtempn(posi, 3))
                         {
                             flag = j;
                             continue;
@@ -368,16 +367,16 @@ void Solution::judgeRelation()
         }
         posi += s.size();
         cnt++;
-        cout << posi << endl;
+        //cout << posi << endl;
     }
 
-    cout << cnt << endl;
+    //cout << cnt << endl;
 }
 void Solution::countRate()
 {
     double a = StrOf01.size() + huffTable.size();
     double b = len;
-    compressionRate = a / len/8;
+    compressionRate = a / len / 8;
     cout << a << endl
          << b << endl;
     cout << "The compression rate is " << compressionRate << endl;
@@ -531,7 +530,7 @@ int main(int argc, char *argv[])
 {
     Solution s;
     // s.readFlie(argv[2]);
-    s.readFlie("txt01.txt");
+    s.readFlie("txt02.txt");
     cout << 1 << endl;
     s.statistics(s.originalStr);
     // for(int i = 0; i < 128; i++)
@@ -546,15 +545,13 @@ int main(int argc, char *argv[])
     // 	}
     // }
     cout << 2 << endl;
-    s.calculatetempn();
-    cout << 3 << endl;
     s.judgeRelation();
-    cout << 4 << endl;
+    cout << 3 << endl;
     s.buildTree();
-    cout << 5 << endl;
+    cout << 4 << endl;
     s.encode();
-    cout << 6 << endl;
+    cout << 5 << endl;
     s.writeBinaryFile("out.txt");
-    cout << 7 << endl;
+    cout << 6 << endl;
     s.countRate();
 }
