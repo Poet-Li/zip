@@ -1,6 +1,6 @@
 #define MAX 1001
 #define MAXWINDOW 3
-#define yuzhi 1
+#define yuzhi 0.8
 #define Longest 4 //最长的字符字串的长度
 #include <iostream>
 #include <map>
@@ -24,17 +24,15 @@ public:
         Matrix res;
         for (int i = 0; i < 128; i++)
             for (int j = 0; j < 128; j++)
-                for (int u = 0; u < 128; u++)
-                    res.val[i][j] = (res.val[i][j] + val[i][u] * b.val[u][j]);
+                for (int u = 0; u < 128; u++)
+                        res.val[i][j] = (res.val[i][j] + val[i][u] * b.val[u][j]);
         return res;
     }
-    Matrix operator=(const Matrix &b)
+    void operator=(const Matrix &b)
     {
-        Matrix res;
         for (int i = 0; i < 128; i++)
             for (int j = 0; j < 128; j++)
-                res.val[i][j] = b.val[i][j];
-        return res;
+                val[i][j] = b.val[i][j];
     }
 };
 
@@ -315,7 +313,7 @@ void Solution::judgeRelation()
                 if (j - posi == 2)
                 {
                     int p = originalStr[posi];
-                    int b = originalStr[j];
+                    int b = originalStr[j + posi];
                     if (p2.val[p][b] >= forwardtempn[posi][j - posi] &&
                         n2.val[p][b] >= backtempn[posi][j - posi])
                     {
@@ -332,7 +330,7 @@ void Solution::judgeRelation()
                 {
                     {
                         int p = originalStr[posi];
-                        int b = originalStr[j];
+                        int b = originalStr[j + posi];
                         if (p3.val[p][b] >= forwardtempn[posi][j - posi] &&
                             n3.val[p][b] >= backtempn[posi][j - posi])
                         {
@@ -359,6 +357,8 @@ void Solution::judgeRelation()
             stringset[s]++;
         }
         posi += s.size();
+
+        cout << posi << endl;
     }
 }
 void Solution::countRate()
