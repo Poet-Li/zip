@@ -28,6 +28,7 @@ public:
                 {
                     res.val[i][j] = (res.val[i][j] + val[i][k] * b.val[k][j]);
                 }
+        return res;
     }
     void operator=(const Matrix &b)
     {
@@ -557,7 +558,7 @@ int main(int argc, char *argv[])
 {
     Solution s;
     // s.readFlie(argv[2]);
-    s.readFlie("txt01.txt");
+    s.readFlie("txt04.txt");
     cout << 1 << endl;
     s.statistics(s.originalStr);
     // for(int i = 0; i < 128; i++)
