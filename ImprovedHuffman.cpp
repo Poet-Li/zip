@@ -1,6 +1,6 @@
 #define MAX 3001
 #define MAXWINDOW 3
-#define yuzhi 0.5
+#define yuzhi 0.3
 #define Longest 4 //最长的字符字串的长度
 #include <algorithm>
 #include <bitset>
@@ -302,8 +302,8 @@ void Solution::judgeRelation()
             {
                 int p = originalStr[i];
                 int w = originalStr[i + step];
-                if (p1.val[p][w] > forwardtemp1[i] &&
-                    n1.val[p][w] > backtemp1[i])
+                if (p1.val[p][w] > forwardtemp1[p] &&
+                    n1.val[p][w] > backtemp1[p])
                 {
                     flag = i + step;
                     continue;
