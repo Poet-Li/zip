@@ -1,6 +1,6 @@
 #define MAX 3001
 #define MAXWINDOW 3
-#define yuzhi 0.3
+#define yuzhi 0.5
 #define Longest 4 //最长的字符字串的长度
 #include <algorithm>
 #include <bitset>
@@ -282,7 +282,6 @@ void Solution::judgeRelation()
 {
     int posi = 0;
     int step;
-    int cnt = 0;
     int flag = 0;
     calculatetemp1();
     for (int i = 0; i < 128; i++)
@@ -292,9 +291,7 @@ void Solution::judgeRelation()
         stringset.insert(map<string, int>::value_type(s, 0));
     }
     while (posi < len)
-    {   
-        if (len > 1)
-        {
+    {
             step = 1;
             for (int i = posi; i < MAXWINDOW + posi; i++)
             {
@@ -359,21 +356,18 @@ void Solution::judgeRelation()
                 }
             }
             string s = originalStr.substr(posi, flag + 1 - posi);
-        }
-        
-        pair<map<string, int>::iterator, bool> Insert_Pair;
 
-        Insert_Pair = stringset.insert(map<string, int>::value_type(s, 1));
+            pair<map<string, int>::iterator, bool> Insert_Pair;
 
-        if (!Insert_Pair.second)
-        {
-            stringset[s]++;
-        }
-        posi += s.size();
-        cnt++;
+            Insert_Pair = stringset.insert(map<string, int>::value_type(s, 1));
+
+            if (!Insert_Pair.second)
+            {
+                stringset[s]++;
+            }
+            posi += s.size();
         //cout << posi << endl;
     }
-
     //cout << cnt << endl;
 }
 void Solution::countRate()
@@ -472,14 +466,14 @@ void Solution::encode()
         //huffTable += iter->first;
         string s01 = iter->first;
         string sub;
-        if(s01.length() <= 8)
+        if (s01.length() <= 8)
         {
             bitset<8> bit(s01);
             char a = bit.to_ulong(); //这里为0-256
             huffTable += a;
         }
 
-        if(s01.length() > 8)
+        if (s01.length() > 8)
         {
             sub = s01.substr(0, 8);
             bitset<8> bit(sub);
@@ -493,7 +487,6 @@ void Solution::encode()
         }
         huffTable += "\a";
         huffTable += iter->second;
-
     }
     huffTable += "\a";
     huffTable += "\t";
