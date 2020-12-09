@@ -362,7 +362,6 @@ void Solution::judgeRelation()
         }
         posi += s.size();
         cnt++;
-
         cout << posi << endl;
     }
     cout << cnt << endl;
