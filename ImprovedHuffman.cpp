@@ -28,9 +28,10 @@ class Matrix {
                 }
         return res;
     }
-    void operator=(const Matrix &b) {
+    Matrix& operator=(const Matrix &b) {
         for (int i = 0; i < 128; i++)
             for (int j = 0; j < 128; j++) val[i][j] = b.val[i][j];
+        return *this;
     }
 };
 
@@ -357,7 +358,12 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
             cout << "fail" << endl;
         }
     }
-    // 处理屁股
+
+    // cout<<huffmanCode.find("00")->second<<endl;
+
+    // cout<<"!"<<originalStr<<endl;
+    // cout<<StrOf01.substr(StrOf01.size()-30, 30)<<endl;
+    //处理屁股
     while(!originalStr.empty())
     {
         TempLength = originalStr.length();
@@ -372,14 +378,19 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
         if (TempLength == 0) {
             cout << "fail" << endl;
         }
-    }
+    } 
+    // cout<<"!"<<originalStr<<endl;
+    // cout<<StrOf01.substr(StrOf01.size()-30, 30)<<endl;
 
 
     // 补全八位
-    cout<<StrOf01.size() % 8 << endl;
-    int num = StrOf01.length() % 8;
-    StrOf01.insert(int(StrOf01.length() / 8) * 8, 8-num, '0');
-    cout<<StrOf01.size() % 8 << endl;
+    // cout<<StrOf01.size() % 8 << endl;
+    // cout<<StrOf01.substr(StrOf01.size()-20,20)<<endl;
+    // int num = StrOf01.length() % 8;
+    // StrOf01.insert(int(StrOf01.length() / 8) * 8, 8-num, '0');
+    // cout<<StrOf01.substr(StrOf01.size()-20,20)<<endl;
+    // cout<<StrOf01.size() % 8 << endl;
+
 
 
     // string huffTable; //储存map部分
@@ -416,10 +427,12 @@ void Solution::writeBinaryFile(string fileToWrite) {
         outFile.put(a);
     }
     i -= wlen;
-    string sub = StrOf01.substr(i + 1, StrOf01.length() - i);
-    bitset<8> bit(sub);
-    char a = bit.to_ulong();  //这里为0-256
-    outFile.put(a);
+    //i += 1; //???????????????????????????????我日？？？？？？？？？？？？
+    while(i < StrOf01.length())
+    {
+        outFile.put(StrOf01[i]);
+        i++;
+    }
 
     for (i = 0; i < huffTable.length(); i++) {
         outFile.put(huffTable[i]);
@@ -431,11 +444,12 @@ void Solution::writeBinaryFile(string fileToWrite) {
 void Solution::decode() {
     //得到StrOf01部分
     int temp = 0;
+    StrOf01.clear();
     while (Str_File_Connected.at(temp) != '\a') temp++;
-    string StrOf01 = Str_File_Connected.substr(0, temp);
+    StrOf01 = Str_File_Connected.substr(0, temp);
     Str_File_Connected.erase(Str_File_Connected.begin(),
                              Str_File_Connected.begin() + temp + 1);
-    //cout<<StrOf01.length()<<endl;
+    cout<<StrOf01.length()<<endl;
 
     //载入map部分
     stringset.clear();
@@ -457,8 +471,12 @@ void Solution::decode() {
         stringset.insert(make_pair(first, second));
     }
 
+    cout<<stringset.find("00")->second <<endl;
+
     //通过载入的stringset得到CodeToWord
     buildTree();
+    cout<<huffmanCode.find("00")->second<< "---" <<endl;
+    if(CodeToWord.find("01001010000")==CodeToWord.end()) cout<<"nonexist"<<endl;
     //翻译部分
     int TempLength = 0;
     Str_File_Connected.clear();
@@ -470,8 +488,16 @@ void Solution::decode() {
             //cout<<iter->second<<endl;
             StrOf01.erase(StrOf01.begin(), StrOf01.begin() + TempLength);
             TempLength = 0;
+            continue;
         }
         TempLength++;
+        //if(CodeToWord.find("00")==CodeToWord.end()) cout<<"nonexist"<<endl;
+        // if (TempLength > 10) cout << "ddddd" << endl;
+        // cout<<StrOf01.length()<<endl;
+        if(StrOf01.size() < 100)
+        {
+            cout<<StrOf01<<endl;
+        }
     }
 }
 
@@ -504,22 +530,32 @@ void Solution::readTxtToString(string filePath)
         l.push_back(c);
         infile.get(c);
     }
+
     cout<<l<<endl;
+    //cout<<"c:"<<(int)c<<endl;
     int len = stoi(l);
     len /= 8;
     int cnt = 0;
-    while (cnt++ < len)
+    while (cnt < len)
     {
         infile.get(c);
-        //cout<<"c: "<<(int)c<<endl;
         int c1 = (c < 0) ? c + 256 : c;
         string c2 = convert(c1);
         //cout<<c2<<endl;
         Str_File_Connected.append(c2);
+        cnt++;
     }
+    while(c != '\a')
+    {      
+        infile.get(c);
+        cout<<"c: "<<(int)c<<endl;  
+        Str_File_Connected.push_back(c);
+    }
+    //cout<<Str_File_Connected[19627]<<endl;
     cout<<Str_File_Connected.length()<<endl;
+
     cout<<"-----输入map-----"<<endl;
-    infile.get(c); // ？？？？？？？？？？？？
+    // infile.get(c); // ？？？？？？？？？？？？
     while(infile.peek() != EOF)
     {
         infile.get(c);
@@ -531,7 +567,7 @@ void Solution::readTxtToString(string filePath)
 
 int main(int argc, char *argv[]) {
     // Solution s;
-    // s.readFlie(argv[2]);
+    // //s.readFlie(argv[2]);
     // s.readFlie("txt01.txt");
     // cout << 1 << endl;
     // s.statistics(s.originalStr);
@@ -550,10 +586,21 @@ int main(int argc, char *argv[]) {
     // o.write(s.Str_File_Connected.c_str(), s.Str_File_Connected.size());
     // o.close();
     // cout<<s.Str_File_Connected.size();
+    // s.decode();
+    // s.originalStr.clear();
+    // s.readFlie("txt01.txt");
+    // for(int i = 0; i < 10; i++)
+    // {
+    //     if(s.Str_File_Connected[i] != s.originalStr[i])
+    //     {
+    //         cout<<"i:"<<i << " SF:" <<(int)s.Str_File_Connected[i]<<" origin:"<<(int)s.originalStr[i]<<endl;
+            
+    //     }
+    // }
 
     Solution p;
-    p.readFlie("a.txt");
-    p.readTxtToString("out.txt");
+    p.readFlie("a.txt");    //s.Str_FILE
+    p.readTxtToString("out.txt");   //Str_FILE
     cout<<p.Str_File_Connected.length()<<endl;
     cout<<p.originalStr.length()<<endl;
     for(int i = 0; i < p.originalStr.length(); i++)
@@ -564,19 +611,23 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
-    p.decode();
-    cout<<"fuck!"<<endl;
+    cout<<(int)p.Str_File_Connected[19625]<<" "<<(int)p.Str_File_Connected[19626]<<" "<<(int)p.Str_File_Connected[19627]<<endl;
+    cout<<(int)p.originalStr[19625]<<" "<<(int)p.originalStr[19626]<<" "<<(int)p.originalStr[19627];
 
-    p.originalStr.clear();
-    p.readFlie("txt01.txt");
-    cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
-    for(int i = 0; i < p.originalStr.length(); i++)
-    {
-        if(p.Str_File_Connected[i] != p.originalStr[i])
-        {
-            cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
-            break;
-        }
-    }
+
+//     //p.decode();
+//     cout<<"fuck!"<<endl;
+
+    // p.originalStr.clear();
+    // p.readFlie("txt01.txt");
+    // cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
+    // for(int i = 0; i < p.originalStr.length(); i++)
+    // {
+    //     if(p.Str_File_Connected[i] != p.originalStr[i])
+    //     {
+    //         cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
+    //         break;
+    //     }
+    // }
 
 }
