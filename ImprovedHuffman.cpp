@@ -11,6 +11,7 @@
 #include <map>
 #include <queue>
 #include <vector>
+#include <cmath>
 using namespace std;
 typedef pair<string, int> node;
 
@@ -104,16 +105,18 @@ class Solution {
     void decode();  //解压缩，由huffmanCode和originalStr得到decodeStr
 
     void countRate();  //计算压缩率
+
+    void readTxtToString(string filePath);
 };
 
 void Solution::readFlie(string filePath) {
     ifstream infile;
-    infile.open(filePath.data());
+    infile.open(filePath.c_str());
     assert(infile.is_open());
     char c;
     infile >> noskipws;
-    while (!infile.eof()) {
-        infile >> c;
+    while (infile.peek() != EOF) {
+        infile.get(c);
         // cout<<c<<endl;
         originalStr.push_back(c);
     }
@@ -156,40 +159,6 @@ void Solution::statistics(string &txt) {
     n2 = n1 * n1;
     n3 = n2 * n1;
     return;
-}
-
-void Solution::writeBinaryFile(string fileToWrite) {
-    ofstream outFile(fileToWrite.c_str(),
-                     ios::binary | ios::out);  //以二进制写模式打开文件
-    if (!outFile) {
-        cout << "New file open error." << endl;
-        return;
-    }
-
-    //得到StrOf01部分
-    int temp = 0;
-    while (Str_File_Connected.at(temp) != '\a') temp++;
-    string huffcode = Str_File_Connected.substr(0, temp);
-    string hufftable =
-        Str_File_Connected.substr(temp + 1, Str_File_Connected.length() - temp);
-
-    int wlen = 8;
-    int i;
-    for (i = 0; i < huffcode.length(); i = i + wlen) {
-        string sub = huffcode.substr(i, wlen);
-        bitset<8> bit(sub);
-        char a = bit.to_ulong();  //这里为0-256
-        outFile.put(a);
-    }
-    i -= wlen;
-    string sub = huffcode.substr(i + 1, huffcode.length() - i);
-    bitset<8> bit(sub);
-    char a = bit.to_ulong();  //这里为0-256
-    outFile.put(a);
-    for (i = 0; i < hufftable.length(); i++) {
-        outFile.put(hufftable[i]);
-    }
-    outFile.close();
 }
 
 void Solution::calculatetemp1() {
@@ -388,7 +357,31 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
             cout << "fail" << endl;
         }
     }
-    // cout << "test" << endl;
+    // 处理屁股
+    while(!originalStr.empty())
+    {
+        TempLength = originalStr.length();
+        map<string, string>::iterator iter = huffmanCode.find(originalStr.substr(0, TempLength));
+        if (iter != huffmanCode.end()) {
+            StrOf01 += iter->second;
+            originalStr.erase(originalStr.begin(),
+                                originalStr.begin() + TempLength);
+            TempLength = Longest;
+        }
+        TempLength--;
+        if (TempLength == 0) {
+            cout << "fail" << endl;
+        }
+    }
+
+
+    // 补全八位
+    cout<<StrOf01.size() % 8 << endl;
+    int num = StrOf01.length() % 8;
+    StrOf01.insert(int(StrOf01.length() / 8) * 8, 8-num, '0');
+    cout<<StrOf01.size() % 8 << endl;
+
+
     // string huffTable; //储存map部分
     for (map<string, int>::iterator iter = stringset.begin();
          iter != stringset.end(); iter++) {
@@ -402,6 +395,39 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
     Str_File_Connected = StrOf01 + huffTable;
 }
 
+void Solution::writeBinaryFile(string fileToWrite) {
+    ofstream outFile(fileToWrite.c_str(),
+                     ios::binary | ios::out);  //以二进制写模式打开文件
+    if (!outFile) {
+        cout << "New file open error." << endl;
+        return;
+    }
+    // 写进01串的长度
+    string len = to_string(StrOf01.length());
+    outFile.write(len.c_str(), len.length());
+    outFile.put('\n');
+
+    int wlen = 8;
+    int i;
+    for (i = 0; i < StrOf01.length(); i = i + wlen) {
+        string sub = StrOf01.substr(i, wlen);
+        bitset<8> bit(sub);
+        char a = bit.to_ulong();  //这里为0-256
+        outFile.put(a);
+    }
+    i -= wlen;
+    string sub = StrOf01.substr(i + 1, StrOf01.length() - i);
+    bitset<8> bit(sub);
+    char a = bit.to_ulong();  //这里为0-256
+    outFile.put(a);
+
+    for (i = 0; i < huffTable.length(); i++) {
+        outFile.put(huffTable[i]);
+    }
+    //cout << count(Str_File_Connected.begin(), Str_File_Connected.end(), '\a')<<endl;
+    //cout << count(huffTable.begin(), huffTable.end(), '\a')<<endl;
+    outFile.close();
+}
 void Solution::decode() {
     //得到StrOf01部分
     int temp = 0;
@@ -409,6 +435,7 @@ void Solution::decode() {
     string StrOf01 = Str_File_Connected.substr(0, temp);
     Str_File_Connected.erase(Str_File_Connected.begin(),
                              Str_File_Connected.begin() + temp + 1);
+    //cout<<StrOf01.length()<<endl;
 
     //载入map部分
     stringset.clear();
@@ -432,7 +459,6 @@ void Solution::decode() {
 
     //通过载入的stringset得到CodeToWord
     buildTree();
-
     //翻译部分
     int TempLength = 0;
     Str_File_Connected.clear();
@@ -441,6 +467,7 @@ void Solution::decode() {
             CodeToWord.find(StrOf01.substr(0, TempLength));
         if (iter != CodeToWord.end()) {
             Str_File_Connected += iter->second;
+            //cout<<iter->second<<endl;
             StrOf01.erase(StrOf01.begin(), StrOf01.begin() + TempLength);
             TempLength = 0;
         }
@@ -448,31 +475,108 @@ void Solution::decode() {
     }
 }
 
+string convert(int a){
+    string ans;
+    for(int i = 0; i < 8; i++)
+    {
+        int p = pow(2, 7-i);
+        ans.push_back('0' + a / p);
+        a -= p;
+        if(a < 0)   a += p;
+    }
+    return ans;
+}
+
+void Solution::readTxtToString(string filePath)
+{
+    ifstream infile;
+    infile.open(filePath.c_str(), ios::binary | ios::in);
+    assert(infile.is_open());
+
+    char c;
+    //int cnt = 0;
+    infile >> noskipws;
+    infile.get(c);
+
+    string l;
+    while(c != '\n')
+    {
+        l.push_back(c);
+        infile.get(c);
+    }
+    cout<<l<<endl;
+    int len = stoi(l);
+    len /= 8;
+    int cnt = 0;
+    while (cnt++ < len)
+    {
+        infile.get(c);
+        //cout<<"c: "<<(int)c<<endl;
+        int c1 = (c < 0) ? c + 256 : c;
+        string c2 = convert(c1);
+        //cout<<c2<<endl;
+        Str_File_Connected.append(c2);
+    }
+    cout<<Str_File_Connected.length()<<endl;
+    cout<<"-----输入map-----"<<endl;
+    infile.get(c); // ？？？？？？？？？？？？
+    while(infile.peek() != EOF)
+    {
+        infile.get(c);
+        Str_File_Connected.push_back(c);
+        //cout<<"c: "<<(int)c<<endl;
+    }
+    infile.close();
+}
+
 int main(int argc, char *argv[]) {
-    Solution s;
+    // Solution s;
     // s.readFlie(argv[2]);
-    s.readFlie("txt04.txt");
-    cout << 1 << endl;
-    s.statistics(s.originalStr);
-    // for(int i = 0; i < 128; i++)
-    // {
-    // 	for(int j = 0; j < 128; j++)
-    // 	{
-    // 		if(s.p1.val[i][j] != 0)	cout<<"i: "<<i<<" j: "<<j<<" val:
-    // "<<s.p1.val[i][j]<<endl; 		if(s.n2.val[i][j] != 0)
-    // cout<<"i:
-    // "<<i<<" j:
-    // "<<j<<" val: "<<s.n2.val[i][j]<<endl;
-    // 	}
-    // }
-    cout << 2 << endl;
-    s.judgeRelation();
-    cout << 3 << endl;
-    s.buildTree();
-    cout << 4 << endl;
-    s.encode();
-    cout << 5 << endl;
-    s.writeBinaryFile("out.txt");
-    cout << 6 << endl;
-    s.countRate();
+    // s.readFlie("txt01.txt");
+    // cout << 1 << endl;
+    // s.statistics(s.originalStr);
+    // cout << 2 << endl;
+    // s.judgeRelation();
+    // cout << 3 << endl;
+    // s.buildTree();
+    // cout << 4 << endl;
+    // s.encode();
+    // cout << 5 << endl;
+    // s.writeBinaryFile("out.txt");
+    // cout << 6 << endl;
+    // s.countRate();
+
+    // ofstream o("a.txt");
+    // o.write(s.Str_File_Connected.c_str(), s.Str_File_Connected.size());
+    // o.close();
+    // cout<<s.Str_File_Connected.size();
+
+    Solution p;
+    p.readFlie("a.txt");
+    p.readTxtToString("out.txt");
+    cout<<p.Str_File_Connected.length()<<endl;
+    cout<<p.originalStr.length()<<endl;
+    for(int i = 0; i < p.originalStr.length(); i++)
+    {
+        if(p.Str_File_Connected[i] != p.originalStr[i])
+        {
+            cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
+            break;
+        }
+    }
+    p.decode();
+    cout<<"fuck!"<<endl;
+
+    p.originalStr.clear();
+    p.readFlie("txt01.txt");
+    cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
+    for(int i = 0; i < p.originalStr.length(); i++)
+    {
+        if(p.Str_File_Connected[i] != p.originalStr[i])
+        {
+            cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
+            break;
+        }
+    }
+
 }
