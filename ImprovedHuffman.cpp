@@ -293,7 +293,9 @@ void Solution::judgeRelation()
     }
     while (posi < len)
     {   
-        if (len > 1)
+        
+        string s = originalStr.substr(posi, 1);
+        if (len > 10000)
         {
             step = 1;
             for (int i = posi; i < MAXWINDOW + posi; i++)
@@ -358,7 +360,7 @@ void Solution::judgeRelation()
                     }
                 }
             }
-            string s = originalStr.substr(posi, flag + 1 - posi);
+            s = originalStr.substr(posi, flag + 1 - posi);
         }
         
         pair<map<string, int>::iterator, bool> Insert_Pair;
@@ -556,7 +558,7 @@ int main(int argc, char *argv[])
 {
     Solution s;
     // s.readFlie(argv[2]);
-    s.readFlie("txt01.txt");
+    s.readFlie("txt04.txt");
     cout << 1 << endl;
     s.statistics(s.originalStr);
     // for(int i = 0; i < 128; i++)
