@@ -1,17 +1,17 @@
-#define MAX 3001
+#define MAX 3005
 #define MAXWINDOW 3
 #define yuzhi 0.5
 #define Longest 4  //最长的字符字串的长度
 #include <algorithm>
 #include <bitset>
 #include <cassert>
+#include <cmath>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <queue>
 #include <vector>
-#include <cmath>
 using namespace std;
 typedef pair<string, int> node;
 
@@ -28,7 +28,7 @@ class Matrix {
                 }
         return res;
     }
-    Matrix& operator=(const Matrix &b) {
+    Matrix &operator=(const Matrix &b) {
         for (int i = 0; i < 128; i++)
             for (int j = 0; j < 128; j++) val[i][j] = b.val[i][j];
         return *this;
@@ -74,7 +74,7 @@ class Solution {
     map<string, string> huffmanCode;  //字符子串与编码的一一映射
     map<string, string> CodeToWord;   //编码到字符字串的映射
     // string originalStr;                  //整个字符串对应的编码集
-    string StrOf01;    //用字符串存的01串嗷
+    string StrOf05;    //用字符串存的05串嗷
     string huffTable;  //映射表
 
     string Str_File_Connected;  //治达用这个string来做文件操作就行
@@ -285,7 +285,7 @@ void Solution::judgeRelation() {
     // cout << cnt << endl;
 }
 void Solution::countRate() {
-    double a = StrOf01.size() + huffTable.size();
+    double a = StrOf05.size() + huffTable.size();
     double b = len;
     compressionRate = a / len / 8;
     cout << a << endl << b << endl;
@@ -347,7 +347,7 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
         map<string, string>::iterator iter =
             huffmanCode.find(originalStr.substr(0, TempLength));
         if (iter != huffmanCode.end()) {
-            StrOf01 += iter->second;
+            StrOf05 += iter->second;
             originalStr.erase(originalStr.begin(),
                               originalStr.begin() + TempLength);
             TempLength = Longest;
@@ -362,38 +362,38 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
     // cout<<huffmanCode.find("00")->second<<endl;
 
     // cout<<"!"<<originalStr<<endl;
-    // cout<<StrOf01.substr(StrOf01.size()-30, 30)<<endl;
+    // cout<<StrOf05.substr(StrOf05.size()-30, 30)<<endl;
     //处理屁股
-    while(!originalStr.empty())
-    {
-        TempLength = originalStr.length();
-        map<string, string>::iterator iter = huffmanCode.find(originalStr.substr(0, TempLength));
+    cout << "-----" << endl;
+    TempLength = originalStr.length();
+    while (!originalStr.empty()) {
+        map<string, string>::iterator iter =
+            huffmanCode.find(originalStr.substr(0, TempLength));
         if (iter != huffmanCode.end()) {
-            StrOf01 += iter->second;
+            StrOf05 += iter->second;
             originalStr.erase(originalStr.begin(),
-                                originalStr.begin() + TempLength);
-            TempLength = Longest;
+                              originalStr.begin() + TempLength);
+            TempLength = originalStr.length();
+            continue;
         }
         TempLength--;
         if (TempLength == 0) {
             cout << "fail" << endl;
         }
-    } 
+    }
     // cout<<"!"<<originalStr<<endl;
-    // cout<<StrOf01.substr(StrOf01.size()-30, 30)<<endl;
-
+    // cout<<StrOf05.substr(StrOf05.size()-30, 30)<<endl;
 
     // 补全八位
-    // cout<<StrOf01.size() % 8 << endl;
-    // cout<<StrOf01.substr(StrOf01.size()-20,20)<<endl;
-    // int num = StrOf01.length() % 8;
-    // StrOf01.insert(int(StrOf01.length() / 8) * 8, 8-num, '0');
-    // cout<<StrOf01.substr(StrOf01.size()-20,20)<<endl;
-    // cout<<StrOf01.size() % 8 << endl;
-
-
+    // cout<<StrOf05.size() % 8 << endl;
+    // cout<<StrOf05.substr(StrOf05.size()-20,20)<<endl;
+    // int num = StrOf05.length() % 8;
+    // StrOf05.insert(int(StrOf05.length() / 8) * 8, 8-num, '0');
+    // cout<<StrOf05.substr(StrOf05.size()-20,20)<<endl;
+    // cout<<StrOf05.size() % 8 << endl;
 
     // string huffTable; //储存map部分
+    huffTable.clear();
     for (map<string, int>::iterator iter = stringset.begin();
          iter != stringset.end(); iter++) {
         huffTable += "\a";
@@ -403,7 +403,7 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
     }
     huffTable += "\a";
     huffTable += "\t";
-    Str_File_Connected = StrOf01 + huffTable;
+    Str_File_Connected = StrOf05 + huffTable;
 }
 
 void Solution::writeBinaryFile(string fileToWrite) {
@@ -413,43 +413,43 @@ void Solution::writeBinaryFile(string fileToWrite) {
         cout << "New file open error." << endl;
         return;
     }
-    // 写进01串的长度
-    string len = to_string(StrOf01.length());
+    // 写进05串的长度
+    string len = to_string(StrOf05.length());
     outFile.write(len.c_str(), len.length());
     outFile.put('\n');
 
     int wlen = 8;
     int i;
-    for (i = 0; i < StrOf01.length(); i = i + wlen) {
-        string sub = StrOf01.substr(i, wlen);
+    for (i = 0; i <= StrOf05.length() - 8; i = i + wlen) {
+        string sub = StrOf05.substr(i, wlen);
         bitset<8> bit(sub);
         char a = bit.to_ulong();  //这里为0-256
         outFile.put(a);
     }
-    i -= wlen;
-    //i += 1; //???????????????????????????????我日？？？？？？？？？？？？
-    while(i < StrOf01.length())
-    {
-        outFile.put(StrOf01[i]);
+    // i -= wlen;
+    // i += 1; //???????????????????????????????我日？？？？？？？？？？？？
+    while (i < StrOf05.length()) {
+        outFile.put(StrOf05[i]);
         i++;
     }
 
     for (i = 0; i < huffTable.length(); i++) {
         outFile.put(huffTable[i]);
     }
-    //cout << count(Str_File_Connected.begin(), Str_File_Connected.end(), '\a')<<endl;
-    //cout << count(huffTable.begin(), huffTable.end(), '\a')<<endl;
+    // cout << count(Str_File_Connected.begin(), Str_File_Connected.end(),
+    // '\a')<<endl; cout << count(huffTable.begin(), huffTable.end(),
+    // '\a')<<endl;
     outFile.close();
 }
 void Solution::decode() {
-    //得到StrOf01部分
+    //得到StrOf05部分
     int temp = 0;
-    StrOf01.clear();
+    StrOf05.clear();
     while (Str_File_Connected.at(temp) != '\a') temp++;
-    StrOf01 = Str_File_Connected.substr(0, temp);
+    StrOf05 = Str_File_Connected.substr(0, temp);
     Str_File_Connected.erase(Str_File_Connected.begin(),
                              Str_File_Connected.begin() + temp + 1);
-    cout<<StrOf01.length()<<endl;
+    cout << StrOf05.length() << endl;
 
     //载入map部分
     stringset.clear();
@@ -465,171 +465,154 @@ void Solution::decode() {
         while (Str_File_Connected.at(temp) != '\a') {
             temp++;
         }
-        int second = stoi(Str_File_Connected.substr(tempbegin, temp - tempbegin));
+        int second =
+            stoi(Str_File_Connected.substr(tempbegin, temp - tempbegin));
         temp++;
         tempbegin = temp;
         stringset.insert(make_pair(first, second));
     }
-
-    cout<<stringset.find("00")->second <<endl;
+    cout << "fdsfsdf" << endl;
+    // cout<<stringset.find("00")->second <<endl;
 
     //通过载入的stringset得到CodeToWord
     buildTree();
-    cout<<huffmanCode.find("00")->second<< "---" <<endl;
-    if(CodeToWord.find("01001010000")==CodeToWord.end()) cout<<"nonexist"<<endl;
+    // cout<<huffmanCode.find("00")->second<< "---" <<endl;
+    // if(CodeToWord.find("050050000")==CodeToWord.end())
+    // cout<<"nonexist"<<endl;
     //翻译部分
     int TempLength = 0;
     Str_File_Connected.clear();
-    while (!StrOf01.empty()) {
+    while (!StrOf05.empty()) {
         map<string, string>::iterator iter =
-            CodeToWord.find(StrOf01.substr(0, TempLength));
+            CodeToWord.find(StrOf05.substr(0, TempLength));
         if (iter != CodeToWord.end()) {
             Str_File_Connected += iter->second;
-            //cout<<iter->second<<endl;
-            StrOf01.erase(StrOf01.begin(), StrOf01.begin() + TempLength);
+            // cout<<iter->second<<endl;
+            StrOf05.erase(StrOf05.begin(), StrOf05.begin() + TempLength);
             TempLength = 0;
             continue;
         }
         TempLength++;
-        //if(CodeToWord.find("00")==CodeToWord.end()) cout<<"nonexist"<<endl;
+        // if(CodeToWord.find("00")==CodeToWord.end()) cout<<"nonexist"<<endl;
         // if (TempLength > 10) cout << "ddddd" << endl;
-        // cout<<StrOf01.length()<<endl;
-        if(StrOf01.size() < 100)
-        {
-            cout<<StrOf01<<endl;
+        // cout<<StrOf05.length()<<endl;
+        if (StrOf05.size() < 100) {
+            cout << StrOf05 << endl;
         }
     }
 }
 
-string convert(int a){
+string convert(int a) {
     string ans;
-    for(int i = 0; i < 8; i++)
-    {
-        int p = pow(2, 7-i);
+    for (int i = 0; i < 8; i++) {
+        int p = pow(2, 7 - i);
         ans.push_back('0' + a / p);
         a -= p;
-        if(a < 0)   a += p;
+        if (a < 0) a += p;
     }
     return ans;
 }
 
-void Solution::readTxtToString(string filePath)
-{
+void Solution::readTxtToString(string filePath) {
     ifstream infile;
     infile.open(filePath.c_str(), ios::binary | ios::in);
     assert(infile.is_open());
 
     char c;
-    //int cnt = 0;
+    // int cnt = 0;
     infile >> noskipws;
     infile.get(c);
 
     string l;
-    while(c != '\n')
-    {
+    while (c != '\n') {
         l.push_back(c);
         infile.get(c);
     }
 
-    cout<<l<<endl;
-    //cout<<"c:"<<(int)c<<endl;
+    cout << l << endl;
+    // cout<<"c:"<<(int)c<<endl;
     int len = stoi(l);
     len /= 8;
     int cnt = 0;
-    while (cnt < len)
-    {
+    while (cnt < len) {
         infile.get(c);
         int c1 = (c < 0) ? c + 256 : c;
         string c2 = convert(c1);
-        //cout<<c2<<endl;
+        // cout<<c2<<endl;
         Str_File_Connected.append(c2);
         cnt++;
     }
-    while(c != '\a')
-    {      
-        infile.get(c);
-        cout<<"c: "<<(int)c<<endl;
-        Str_File_Connected.push_back(c);
-        if(c == 0)  Str_File_Connected.pop_back();
-    }
-    //cout<<Str_File_Connected[19627]<<endl;
-    cout<<Str_File_Connected.length()<<endl;
 
-    cout<<"-----输入map-----"<<endl;
+
+    //infile.get(c);
+
+
+    while (c != '\a') {
+        infile.get(c);
+        cout << "c: " << (int)c << endl;
+        Str_File_Connected.push_back(c);
+    }
+    // cout<<Str_File_Connected[19627]<<endl;
+    cout << Str_File_Connected.length() << endl;
+
+    cout << "-----输入map-----" << endl;
     // infile.get(c); // ？？？？？？？？？？？？
-    while(infile.peek() != EOF)
-    {
+    while (infile.peek() != EOF) {
         infile.get(c);
         Str_File_Connected.push_back(c);
-        //cout<<"c: "<<(int)c<<endl;
+        // cout<<"c: "<<(int)c<<endl;
     }
     infile.close();
 }
 
 int main(int argc, char *argv[]) {
-    // Solution s;
-    // //s.readFlie(argv[2]);
-    // s.readFlie("txt01.txt");
-    // cout << 1 << endl;
-    // s.statistics(s.originalStr);
-    // cout << 2 << endl;
-    // s.judgeRelation();
-    // cout << 3 << endl;
-    // s.buildTree();
-    // cout << 4 << endl;
-    // s.encode();
-    // cout << 5 << endl;
-    // s.writeBinaryFile("out.txt");
-    // cout << 6 << endl;
-    // s.countRate();
+    Solution s;
+    // s.readFlie(argv[2]);
+    s.readFlie("txt05.txt");
+    cout << 1 << endl;
+    s.statistics(s.originalStr);
+    cout << 2 << endl;
+    s.judgeRelation();
+    cout << 3 << endl;
+    s.buildTree();
+    cout << 4 << endl;
+    s.encode();
+    cout << 5 << endl;
+    s.writeBinaryFile("out.txt");
+    cout << 6 << endl;
+    s.countRate();
 
-    // ofstream o("a.txt");
-    // o.write(s.Str_File_Connected.c_str(), s.Str_File_Connected.size());
-    // o.close();
-    // cout<<s.Str_File_Connected.size();
-    // s.decode();
-    // s.originalStr.clear();
-    // s.readFlie("txt01.txt");
-    // for(int i = 0; i < 10; i++)
+    ofstream o("a.txt");
+    o.write(s.Str_File_Connected.c_str(), s.Str_File_Connected.size());
+    o.close();
+
+    // Solution p;
+    // p.readFlie("a.txt");    //s.Str_FILE
+    // p.readTxtToString("out.txt");   //Str_FILE
+    // cout<<p.Str_File_Connected.length()<<endl;
+    // cout<<p.originalStr.length()<<endl;
+    // for(int i = 0; i < p.originalStr.length(); i++)
     // {
-    //     if(s.Str_File_Connected[i] != s.originalStr[i])
+    //     if(p.Str_File_Connected[i] != p.originalStr[i])
     //     {
-    //         cout<<"i:"<<i << " SF:" <<(int)s.Str_File_Connected[i]<<" origin:"<<(int)s.originalStr[i]<<endl;
-            
+    //         cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl; break;
     //     }
     // }
-
-    Solution p;
-    p.readFlie("a.txt");    //s.Str_FILE
-    p.readTxtToString("out.txt");   //Str_FILE
-    cout<<p.Str_File_Connected.length()<<endl;
-    cout<<p.originalStr.length()<<endl;
-    for(int i = 0; i < p.originalStr.length(); i++)
-    {
-        if(p.Str_File_Connected[i] != p.originalStr[i])
-        {
-            cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
-            break;
-        }
-    }
     // cout<<(int)p.Str_File_Connected[19625]<<" "<<(int)p.Str_File_Connected[19626]<<" "<<(int)p.Str_File_Connected[19627]<<endl;
-    // cout<<(int)p.originalStr[19625]<<" "<<(int)p.originalStr[19626]<<" "<<(int)p.originalStr[19627];
+    // // cout<<(int)p.originalStr[19625]<<" "<<(int)p.originalStr[19626]<<" "<<(int)p.originalStr[19627];
 
+    // p.decode();
+    // cout<<"fuck!"<<endl;
 
-    p.decode();
-    cout<<"fuck!"<<endl;
-
-    p.originalStr.clear();
-    p.readFlie("txt01.txt");
-    cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
-    for(int i = 0; i < p.originalStr.length(); i++)
-    {
-        if(p.Str_File_Connected[i] != p.originalStr[i])
-        {
-            cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
-            break;
-        }
-    }
-    cout<<(p.originalStr == p.Str_File_Connected);
-
+    // p.originalStr.clear();
+    // p.readFlie("txt05.txt");
+    // cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
+    // for(int i = 0; i < p.originalStr.length(); i++)
+    // {
+    //     if(p.Str_File_Connected[i] != p.originalStr[i])
+    //     {
+    //         cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<"origin:"<<(int)p.originalStr[i]<<endl; break;
+    //     }
+    // }
+    // cout<<(p.originalStr == p.Str_File_Connected);
 }
