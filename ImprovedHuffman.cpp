@@ -548,8 +548,9 @@ void Solution::readTxtToString(string filePath)
     while(c != '\a')
     {      
         infile.get(c);
-        cout<<"c: "<<(int)c<<endl;  
+        cout<<"c: "<<(int)c<<endl;
         Str_File_Connected.push_back(c);
+        if(c == 0)  Str_File_Connected.pop_back();
     }
     //cout<<Str_File_Connected[19627]<<endl;
     cout<<Str_File_Connected.length()<<endl;
@@ -611,23 +612,24 @@ int main(int argc, char *argv[]) {
             break;
         }
     }
-    cout<<(int)p.Str_File_Connected[19625]<<" "<<(int)p.Str_File_Connected[19626]<<" "<<(int)p.Str_File_Connected[19627]<<endl;
-    cout<<(int)p.originalStr[19625]<<" "<<(int)p.originalStr[19626]<<" "<<(int)p.originalStr[19627];
+    // cout<<(int)p.Str_File_Connected[19625]<<" "<<(int)p.Str_File_Connected[19626]<<" "<<(int)p.Str_File_Connected[19627]<<endl;
+    // cout<<(int)p.originalStr[19625]<<" "<<(int)p.originalStr[19626]<<" "<<(int)p.originalStr[19627];
 
 
-//     //p.decode();
-//     cout<<"fuck!"<<endl;
+    p.decode();
+    cout<<"fuck!"<<endl;
 
-    // p.originalStr.clear();
-    // p.readFlie("txt01.txt");
-    // cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
-    // for(int i = 0; i < p.originalStr.length(); i++)
-    // {
-    //     if(p.Str_File_Connected[i] != p.originalStr[i])
-    //     {
-    //         cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
-    //         break;
-    //     }
-    // }
+    p.originalStr.clear();
+    p.readFlie("txt01.txt");
+    cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
+    for(int i = 0; i < p.originalStr.length(); i++)
+    {
+        if(p.Str_File_Connected[i] != p.originalStr[i])
+        {
+            cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl;
+            break;
+        }
+    }
+    cout<<(p.originalStr == p.Str_File_Connected);
 
 }
