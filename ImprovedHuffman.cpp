@@ -246,11 +246,11 @@ void Solution::judgeRelation() {
     int step;
     int flag = 0;
     calculatetemp1();
-    for (int i = 0; i < 128; i++) {
-        char k = i;
-        string s(1, k);
-        stringset.insert(map<string, int>::value_type(s, 0));
-    }
+    // for (int i = 0; i < 128; i++) {
+    //     char k = i;
+    //     string s(1, k);
+    //     stringset.insert(map<string, int>::value_type(s, 0));
+    // }
     while (posi < len) {
         step = 1;
         for (int i = posi; i < MAXWINDOW + posi; i++) {
