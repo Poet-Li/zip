@@ -108,6 +108,8 @@ class Solution {
     void countRate();  //计算压缩率
 
     void readTxtToString(string filePath);
+
+    void writeStringToTxt(string filePath);
 };
 
 void Solution::readFlie(string filePath) {
@@ -288,8 +290,8 @@ void Solution::countRate() {
     double a = StrOf05.size() + huffTable.size();
     double b = len;
     compressionRate = a / len / 8;
-    cout << a << endl << b << endl;
-    cout << "The compression rate is " << compressionRate << endl;
+    //cout << a << endl << b << endl;
+    cout << "文本压缩完成！压缩率为" << compressionRate << endl;
 }
 
 void Solution::getHuffmanCode(TreeNode *treenode, string code) {
@@ -364,7 +366,7 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
     // cout<<"!"<<originalStr<<endl;
     // cout<<StrOf05.substr(StrOf05.size()-30, 30)<<endl;
     //处理屁股
-    cout << "-----" << endl;
+    //cout << "-----" << endl;
     TempLength = originalStr.length();
     while (!originalStr.empty()) {
         map<string, string>::iterator iter =
@@ -449,7 +451,7 @@ void Solution::decode() {
     StrOf05 = Str_File_Connected.substr(0, temp);
     Str_File_Connected.erase(Str_File_Connected.begin(),
                              Str_File_Connected.begin() + temp + 1);
-    cout << StrOf05.length() << endl;
+    //cout << StrOf05.length() << endl;
 
     //载入map部分
     stringset.clear();
@@ -471,7 +473,7 @@ void Solution::decode() {
         tempbegin = temp;
         stringset.insert(make_pair(first, second));
     }
-    cout << "fdsfsdf" << endl;
+    //cout << "fdsfsdf" << endl;
     // cout<<stringset.find("00")->second <<endl;
 
     //通过载入的stringset得到CodeToWord
@@ -496,9 +498,9 @@ void Solution::decode() {
         // if(CodeToWord.find("00")==CodeToWord.end()) cout<<"nonexist"<<endl;
         // if (TempLength > 10) cout << "ddddd" << endl;
         // cout<<StrOf05.length()<<endl;
-        if (StrOf05.size() < 100) {
-            cout << StrOf05 << endl;
-        }
+        // if (StrOf05.size() < 100) {
+        //     cout << StrOf05 << endl;
+        // }
     }
 }
 
@@ -511,6 +513,13 @@ string convert(int a) {
         if (a < 0) a += p;
     }
     return ans;
+}
+
+void Solution::writeStringToTxt(string filePath)
+{
+    ofstream o(filePath);
+    o.write(Str_File_Connected.c_str(), Str_File_Connected.length());
+    o.close();
 }
 
 void Solution::readTxtToString(string filePath) {
@@ -529,7 +538,7 @@ void Solution::readTxtToString(string filePath) {
         infile.get(c);
     }
 
-    cout << l << endl;
+    //cout << l << endl;
     // cout<<"c:"<<(int)c<<endl;
     int len = stoi(l);
     len /= 8;
@@ -547,15 +556,15 @@ void Solution::readTxtToString(string filePath) {
     //infile.get(c);
 
 
-    while (c != '\a') {
-        infile.get(c);
-        cout << "c: " << (int)c << endl;
-        Str_File_Connected.push_back(c);
-    }
+    // while (c != '\a') {
+    //     infile.get(c);
+    //     cout << "c: " << (int)c << endl;
+    //     Str_File_Connected.push_back(c);
+    // }
     // cout<<Str_File_Connected[19627]<<endl;
-    cout << Str_File_Connected.length() << endl;
+    //cout << Str_File_Connected.length() << endl;
 
-    cout << "-----输入map-----" << endl;
+    //cout << "-----输入map-----" << endl;
     // infile.get(c); // ？？？？？？？？？？？？
     while (infile.peek() != EOF) {
         infile.get(c);
@@ -565,54 +574,32 @@ void Solution::readTxtToString(string filePath) {
     infile.close();
 }
 
+
+// 程序使用方法
+// 1. .\ImprovedHuffman.exe ziptxt {文件名} {压缩后的文件名}
+// 2. .\ImprovedHuffman.exe unziptxt {压缩文件名} {解压后的文件名}
+
 int main(int argc, char *argv[]) {
-    Solution s;
-    // s.readFlie(argv[2]);
-    s.readFlie("txt05.txt");
-    cout << 1 << endl;
-    s.statistics(s.originalStr);
-    cout << 2 << endl;
-    s.judgeRelation();
-    cout << 3 << endl;
-    s.buildTree();
-    cout << 4 << endl;
-    s.encode();
-    cout << 5 << endl;
-    s.writeBinaryFile("out.txt");
-    cout << 6 << endl;
-    s.countRate();
-
-    ofstream o("a.txt");
-    o.write(s.Str_File_Connected.c_str(), s.Str_File_Connected.size());
-    o.close();
-
-    // Solution p;
-    // p.readFlie("a.txt");    //s.Str_FILE
-    // p.readTxtToString("out.txt");   //Str_FILE
-    // cout<<p.Str_File_Connected.length()<<endl;
-    // cout<<p.originalStr.length()<<endl;
-    // for(int i = 0; i < p.originalStr.length(); i++)
-    // {
-    //     if(p.Str_File_Connected[i] != p.originalStr[i])
-    //     {
-    //         cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<" origin:"<<(int)p.originalStr[i]<<endl; break;
-    //     }
-    // }
-    // cout<<(int)p.Str_File_Connected[19625]<<" "<<(int)p.Str_File_Connected[19626]<<" "<<(int)p.Str_File_Connected[19627]<<endl;
-    // // cout<<(int)p.originalStr[19625]<<" "<<(int)p.originalStr[19626]<<" "<<(int)p.originalStr[19627];
-
-    // p.decode();
-    // cout<<"fuck!"<<endl;
-
-    // p.originalStr.clear();
-    // p.readFlie("txt05.txt");
-    // cout<<p.originalStr.length()<<endl<<p.Str_File_Connected.length()<<endl;
-    // for(int i = 0; i < p.originalStr.length(); i++)
-    // {
-    //     if(p.Str_File_Connected[i] != p.originalStr[i])
-    //     {
-    //         cout<<"i:"<<i << " SF:" <<(int)p.Str_File_Connected[i]<<"origin:"<<(int)p.originalStr[i]<<endl; break;
-    //     }
-    // }
-    // cout<<(p.originalStr == p.Str_File_Connected);
+    if(argv[1][0] == 'z')
+    {
+        cout<<"正在对文本进行压缩..."<<endl;
+        Solution s;
+        s.readFlie(argv[2]);
+        s.statistics(s.originalStr);
+        s.judgeRelation();
+        s.buildTree();
+        s.encode();
+        s.writeBinaryFile(argv[3]);
+        s.countRate();
+    }
+    else if(argv[1][0] == 'u')
+    {
+        cout<<"正在对文件进行解压..."<<endl;
+        Solution p;
+        p.readTxtToString(argv[2]);   //Str_FILE
+        p.decode();
+        p.writeStringToTxt(argv[3]);
+        cout<<"解压完成！"<<endl;
+    }
+    return 0;
 }
