@@ -1,7 +1,7 @@
-#define MAX 3005
-#define MAXWINDOW 4
+#define MAX 8000
+#define MAXWINDOW 8
 #define yuzhi 0.5
-#define Longest 5 //最长的字符字串的长度
+#define Longest 9 //最长的字符字串的长度
 #include <algorithm>
 #include <bitset>
 #include <cassert>
@@ -40,6 +40,16 @@ public:
     }
 };
 
+double getval(Matrix a, Matrix b, int i, int j)
+{
+    double ans = 0;
+    for (int k = 0; k < 128; k++)
+    {
+        ans = (ans + a.val[i][k] * b.val[k][j]);
+    }
+    return ans;
+}
+
 class TreeNode
 {
 public:
@@ -65,8 +75,8 @@ public:
     int len;            //字符集长度
     double compressionRate;
 
-    double forwardtemp1[MAX]; //一阶向前转移概率阈值
-    double backtemp1[MAX];    //一阶向后转移概率阈值
+    double forwardtemp1[128]; //一阶向前转移概率阈值
+    double backtemp1[128];    //一阶向后转移概率阈值
 
     Matrix p1; //一阶向前转移矩阵
     Matrix n1; //一阶向后转移矩阵
@@ -144,6 +154,7 @@ void Solution::statistics(string &txt)
     memset(mat, 0, sizeof(mat));
 
     count[(int)txt[0]]++;
+
     for (int i = 1; i < len; i++)
     {
         count[(int)txt[i]]++;
@@ -173,6 +184,7 @@ void Solution::statistics(string &txt)
             }
         }
     }
+
     p2 = p1 * p1;
     p3 = p2 * p1;
     p4 = p2 * p2;
@@ -325,6 +337,78 @@ void Solution::judgeRelation()
                         int b = originalStr[posi + 4];
                         if (p4.val[p][b] > getforwardtempn(posi, 4) &&
                             n4.val[p][b] > getbackwardtempn(posi, 4))
+                        {
+                            flag = j;
+                            continue;
+                        }
+                        else
+                        {
+                            flag = j - 1;
+                            break;
+                        }
+                    }
+                }
+                else if (j - posi == 5)
+                {
+                    {
+                        int p = originalStr[posi];
+                        int b = originalStr[posi + 5];
+                        if (getval(p2, p3, p, b) > getforwardtempn(posi, 5) &&
+                            getval(n2, n3, p, b) > getbackwardtempn(posi, 5))
+                        {
+                            flag = j;
+                            continue;
+                        }
+                        else
+                        {
+                            flag = j - 1;
+                            break;
+                        }
+                    }
+                }
+                else if (j - posi == 6)
+                {
+                    {
+                        int p = originalStr[posi];
+                        int b = originalStr[posi + 6];
+                        if (getval(p3, p3, p, b) > getforwardtempn(posi, 6) &&
+                            getval(n3, n3, p, b) > getbackwardtempn(posi, 6))
+                        {
+                            flag = j;
+                            continue;
+                        }
+                        else
+                        {
+                            flag = j - 1;
+                            break;
+                        }
+                    }
+                }
+                else if (j - posi == 7)
+                {
+                    {
+                        int p = originalStr[posi];
+                        int b = originalStr[posi + 7];
+                        if (getval(p4, p3, p, b) > getforwardtempn(posi, 7) &&
+                            getval(n4, n3, p, b) > getbackwardtempn(posi, 7))
+                        {
+                            flag = j;
+                            continue;
+                        }
+                        else
+                        {
+                            flag = j - 1;
+                            break;
+                        }
+                    }
+                }
+                else if (j - posi == 8)
+                {
+                    {
+                        int p = originalStr[posi];
+                        int b = originalStr[posi + 7];
+                        if (getval(p4, p4, p, b) > getforwardtempn(posi, 8) &&
+                            getval(n4, n4, p, b) > getbackwardtempn(posi, 8))
                         {
                             flag = j;
                             continue;
@@ -693,12 +777,19 @@ int main(int argc, char *argv[])
             cout << "Compacting..." << endl;
             Solution s;
             s.readFlie(b);
+            // cout << 1;
             s.statistics(s.originalStr);
+            // cout << 2;
             s.judgeRelation();
+            // cout << 3;
             s.buildTree();
+            // cout << 4;
             s.encode();
+            // cout << 5;
             s.writeBinaryFile(c);
+            // cout << 6;
             s.countRate();
+            // cout << 7;
         }
         else if (a[0] == 'u')
         {
