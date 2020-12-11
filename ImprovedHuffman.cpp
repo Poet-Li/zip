@@ -290,8 +290,9 @@ void Solution::countRate() {
     double a = StrOf05.size() + huffTable.size();
     double b = len;
     compressionRate = a / len / 8;
-    //cout << a << endl << b << endl;
-    cout << "文本压缩完成！压缩率为" << compressionRate << endl;
+    // cout << a << endl << b << endl;
+    cout << "Successfully compact! The compact rate is " << compressionRate
+         << endl;
 }
 
 void Solution::getHuffmanCode(TreeNode *treenode, string code) {
@@ -366,7 +367,7 @@ void Solution::encode() {  //如果字符字串有/t开头的可能会出问题�
     // cout<<"!"<<originalStr<<endl;
     // cout<<StrOf05.substr(StrOf05.size()-30, 30)<<endl;
     //处理屁股
-    //cout << "-----" << endl;
+    // cout << "-----" << endl;
     TempLength = originalStr.length();
     while (!originalStr.empty()) {
         map<string, string>::iterator iter =
@@ -451,7 +452,7 @@ void Solution::decode() {
     StrOf05 = Str_File_Connected.substr(0, temp);
     Str_File_Connected.erase(Str_File_Connected.begin(),
                              Str_File_Connected.begin() + temp + 1);
-    //cout << StrOf05.length() << endl;
+    // cout << StrOf05.length() << endl;
 
     //载入map部分
     stringset.clear();
@@ -473,7 +474,7 @@ void Solution::decode() {
         tempbegin = temp;
         stringset.insert(make_pair(first, second));
     }
-    //cout << "fdsfsdf" << endl;
+    // cout << "fdsfsdf" << endl;
     // cout<<stringset.find("00")->second <<endl;
 
     //通过载入的stringset得到CodeToWord
@@ -515,8 +516,7 @@ string convert(int a) {
     return ans;
 }
 
-void Solution::writeStringToTxt(string filePath)
-{
+void Solution::writeStringToTxt(string filePath) {
     ofstream o(filePath);
     o.write(Str_File_Connected.c_str(), Str_File_Connected.length());
     o.close();
@@ -538,7 +538,7 @@ void Solution::readTxtToString(string filePath) {
         infile.get(c);
     }
 
-    //cout << l << endl;
+    // cout << l << endl;
     // cout<<"c:"<<(int)c<<endl;
     int len = stoi(l);
     len /= 8;
@@ -552,9 +552,7 @@ void Solution::readTxtToString(string filePath) {
         cnt++;
     }
 
-
-    //infile.get(c);
-
+    // infile.get(c);
 
     // while (c != '\a') {
     //     infile.get(c);
@@ -562,9 +560,9 @@ void Solution::readTxtToString(string filePath) {
     //     Str_File_Connected.push_back(c);
     // }
     // cout<<Str_File_Connected[19627]<<endl;
-    //cout << Str_File_Connected.length() << endl;
+    // cout << Str_File_Connected.length() << endl;
 
-    //cout << "-----输入map-----" << endl;
+    // cout << "-----输入map-----" << endl;
     // infile.get(c); // ？？？？？？？？？？？？
     while (infile.peek() != EOF) {
         infile.get(c);
@@ -574,32 +572,36 @@ void Solution::readTxtToString(string filePath) {
     infile.close();
 }
 
-
-// 程序使用方法
-// 1. .\ImprovedHuffman.exe ziptxt {文件名} {压缩后的文件名}
-// 2. .\ImprovedHuffman.exe unziptxt {压缩文件名} {解压后的文件名}
-
 int main(int argc, char *argv[]) {
-    if(argv[1][0] == 'z')
-    {
-        cout<<"正在对文本进行压缩..."<<endl;
-        Solution s;
-        s.readFlie(argv[2]);
-        s.statistics(s.originalStr);
-        s.judgeRelation();
-        s.buildTree();
-        s.encode();
-        s.writeBinaryFile(argv[3]);
-        s.countRate();
-    }
-    else if(argv[1][0] == 'u')
-    {
-        cout<<"正在对文件进行解压..."<<endl;
-        Solution p;
-        p.readTxtToString(argv[2]);   //Str_FILE
-        p.decode();
-        p.writeStringToTxt(argv[3]);
-        cout<<"解压完成！"<<endl;
+    cout
+        << "The usage of this program: " << endl
+        << "1. compact:    ziptxt   {original filename}  {compacted filename}"
+        << endl
+        << "2. uncompact:  unziptxt {compacted filename} {uncompacted filename}"
+        << endl
+        << "3. Enter ctrl+z to quit." << endl
+        << endl;
+    string a, b, c;
+    while (cin >> a >> b >> c) {
+        if (a[0] == 'z') {
+            cout << "Compacting..." << endl;
+            Solution s;
+            s.readFlie(b);
+            s.statistics(s.originalStr);
+            s.judgeRelation();
+            s.buildTree();
+            s.encode();
+            s.writeBinaryFile(c);
+            s.countRate();
+
+        } else if (a[0] == 'u') {
+            cout << "Uncompacting..." << endl;
+            Solution p;
+            p.readTxtToString(b);  // Str_FILE
+            p.decode();
+            p.writeStringToTxt(c);
+            cout << "Sucessfully uncompact!" << endl;
+        }
     }
     return 0;
 }
