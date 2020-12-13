@@ -140,7 +140,8 @@ void Solution::readFlie(string filePath)
     {
         infile.get(c);
         // cout<<c<<endl;
-        originalStr.push_back(c);
+        if(c >= 0 && c < 128)
+            originalStr.push_back(c);
     }
     infile.close();
 }
