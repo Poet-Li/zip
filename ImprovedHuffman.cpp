@@ -180,7 +180,7 @@ void Solution::statistics(string &txt)
             }
             if (sum2 != 0)
             {
-                n1.val[i][k] = (mat[i][k] / sum2);
+                n1.val[i][k] =  (mat[i][k] / sum2);
             }
         }
     }
