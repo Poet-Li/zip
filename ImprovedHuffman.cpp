@@ -1,3 +1,6 @@
+// 编译命令：g++ -std=c++11 ImprovedHuffman.cpp -o ImprovedHuffman.exe
+
+
 #define MAX 8000
 #define MAXWINDOW 8
 #define yuzhi 0.5
@@ -91,7 +94,7 @@ public:
     map<string, string> huffmanCode; //字符子串与编码的一一映射
     map<string, string> CodeToWord;  //编码到字符字串的映射
     // string originalStr;                  //整个字符串对应的编码集
-    string StrOf05;   //用字符串存的05串嗷
+    string StrOf01;   //用字符串存的01串嗷
     string huffTable; //映射表
 
     string Str_File_Connected; //治达用这个string来做文件操作就行
@@ -139,7 +142,6 @@ void Solution::readFlie(string filePath)
     while (infile.peek() != EOF)
     {
         infile.get(c);
-        // cout<<c<<endl;
         if(c >= 0 && c < 128)
             originalStr.push_back(c);
     }
@@ -175,9 +177,6 @@ void Solution::statistics(string &txt)
             if (sum1 != 0)
             {
                 p1.val[i][k] = (mat[i][k] / sum1);
-                // if(mat[i][k] != 0)
-                // cout<<"i:"<<i<<" k:"<<k<<" val:"<<p1.val[i][k]<<"
-                // mat:"<<mat[i][k]<<" sum1:"<<sum1<<endl;
             }
             if (sum2 != 0)
             {
@@ -265,11 +264,6 @@ void Solution::judgeRelation()
     int step;
     int flag = 0;
     calculatetemp1();
-    // for (int i = 0; i < 128; i++) {
-    //     char k = i;
-    //     string s(1, k);
-    //     stringset.insert(map<string, int>::value_type(s, 0));
-    // }
     while (posi < len)
     {
         step = 1;
@@ -434,17 +428,14 @@ void Solution::judgeRelation()
             stringset[s]++;
         }
         posi += s.size();
-        // cout << posi << endl;
     }
-    // cout << cnt << endl;
 }
 void Solution::countRate()
 {
-    double a = StrOf05.size() + huffTable.size();
+    double a = StrOf01.size() + huffTable.size();
     double b = len;
     compressionRate = a / len / 8;
-    // cout << a << endl << b << endl;
-    cout << "Successfully compact! The compact rate is " << compressionRate
+    cout << "Successfully zipped! The zip rate is " << compressionRate
          << endl;
 }
 
@@ -513,7 +504,7 @@ void Solution::encode()
             huffmanCode.find(originalStr.substr(0, TempLength));
         if (iter != huffmanCode.end())
         {
-            StrOf05 += iter->second;
+            StrOf01 += iter->second;
             originalStr.erase(originalStr.begin(),
                               originalStr.begin() + TempLength);
             TempLength = Longest;
@@ -525,13 +516,6 @@ void Solution::encode()
             cout << "fail" << endl;
         }
     }
-
-    // cout<<huffmanCode.find("00")->second<<endl;
-
-    // cout<<"!"<<originalStr<<endl;
-    // cout<<StrOf05.substr(StrOf05.size()-30, 30)<<endl;
-    //处理屁股
-    // cout << "-----" << endl;
     TempLength = originalStr.length();
     while (!originalStr.empty())
     {
@@ -539,7 +523,7 @@ void Solution::encode()
             huffmanCode.find(originalStr.substr(0, TempLength));
         if (iter != huffmanCode.end())
         {
-            StrOf05 += iter->second;
+            StrOf01 += iter->second;
             originalStr.erase(originalStr.begin(),
                               originalStr.begin() + TempLength);
             TempLength = originalStr.length();
@@ -551,16 +535,6 @@ void Solution::encode()
             cout << "fail" << endl;
         }
     }
-    // cout<<"!"<<originalStr<<endl;
-    // cout<<StrOf05.substr(StrOf05.size()-30, 30)<<endl;
-
-    // 补全八位
-    // cout<<StrOf05.size() % 8 << endl;
-    // cout<<StrOf05.substr(StrOf05.size()-20,20)<<endl;
-    // int num = StrOf05.length() % 8;
-    // StrOf05.insert(int(StrOf05.length() / 8) * 8, 8-num, '0');
-    // cout<<StrOf05.substr(StrOf05.size()-20,20)<<endl;
-    // cout<<StrOf05.size() % 8 << endl;
 
     // string huffTable; //储存map部分
     huffTable.clear();
@@ -574,7 +548,7 @@ void Solution::encode()
     }
     huffTable += "\a";
     huffTable += "\t";
-    Str_File_Connected = StrOf05 + huffTable;
+    Str_File_Connected = StrOf01 + huffTable;
 }
 
 void Solution::writeBinaryFile(string fileToWrite)
@@ -586,25 +560,23 @@ void Solution::writeBinaryFile(string fileToWrite)
         cout << "New file open error." << endl;
         return;
     }
-    // 写进05串的长度
-    string len = to_string(StrOf05.length());
+    // 写进01串的长度
+    string len = to_string(StrOf01.length());
     outFile.write(len.c_str(), len.length());
     outFile.put('\n');
 
     int wlen = 8;
     int i;
-    for (i = 0; i <= StrOf05.length() - 8; i = i + wlen)
+    for (i = 0; i <= StrOf01.length() - 8; i = i + wlen)
     {
-        string sub = StrOf05.substr(i, wlen);
+        string sub = StrOf01.substr(i, wlen);
         bitset<8> bit(sub);
         char a = bit.to_ulong(); //这里为0-256
         outFile.put(a);
     }
-    // i -= wlen;
-    // i += 1; //???????????????????????????????我日？？？？？？？？？？？？
-    while (i < StrOf05.length())
+    while (i < StrOf01.length())
     {
-        outFile.put(StrOf05[i]);
+        outFile.put(StrOf01[i]);
         i++;
     }
 
@@ -612,22 +584,18 @@ void Solution::writeBinaryFile(string fileToWrite)
     {
         outFile.put(huffTable[i]);
     }
-    // cout << count(Str_File_Connected.begin(), Str_File_Connected.end(),
-    // '\a')<<endl; cout << count(huffTable.begin(), huffTable.end(),
-    // '\a')<<endl;
     outFile.close();
 }
 void Solution::decode()
 {
-    //得到StrOf05部分
+    //得到StrOf01部分
     int temp = 0;
-    StrOf05.clear();
+    StrOf01.clear();
     while (Str_File_Connected.at(temp) != '\a')
         temp++;
-    StrOf05 = Str_File_Connected.substr(0, temp);
+    StrOf01 = Str_File_Connected.substr(0, temp);
     Str_File_Connected.erase(Str_File_Connected.begin(),
                              Str_File_Connected.begin() + temp + 1);
-    // cout << StrOf05.length() << endl;
 
     //载入map部分
     stringset.clear();
@@ -652,36 +620,28 @@ void Solution::decode()
         tempbegin = temp;
         stringset.insert(make_pair(first, second));
     }
-    // cout << "fdsfsdf" << endl;
-    // cout<<stringset.find("00")->second <<endl;
+
 
     //通过载入的stringset得到CodeToWord
     buildTree();
-    // cout<<huffmanCode.find("00")->second<< "---" <<endl;
-    // if(CodeToWord.find("050050000")==CodeToWord.end())
-    // cout<<"nonexist"<<endl;
+
     //翻译部分
     int TempLength = 0;
     Str_File_Connected.clear();
-    while (!StrOf05.empty())
+    while (!StrOf01.empty())
     {
         map<string, string>::iterator iter =
-            CodeToWord.find(StrOf05.substr(0, TempLength));
+            CodeToWord.find(StrOf01.substr(0, TempLength));
         if (iter != CodeToWord.end())
         {
             Str_File_Connected += iter->second;
             // cout<<iter->second<<endl;
-            StrOf05.erase(StrOf05.begin(), StrOf05.begin() + TempLength);
+            StrOf01.erase(StrOf01.begin(), StrOf01.begin() + TempLength);
             TempLength = 0;
             continue;
         }
         TempLength++;
-        // if(CodeToWord.find("00")==CodeToWord.end()) cout<<"nonexist"<<endl;
-        // if (TempLength > 10) cout << "ddddd" << endl;
-        // cout<<StrOf05.length()<<endl;
-        // if (StrOf05.size() < 100) {
-        //     cout << StrOf05 << endl;
-        // }
+
     }
 }
 
@@ -723,9 +683,6 @@ void Solution::readTxtToString(string filePath)
         l.push_back(c);
         infile.get(c);
     }
-
-    // cout << l << endl;
-    // cout<<"c:"<<(int)c<<endl;
     int len = stoi(l);
     len /= 8;
     int cnt = 0;
@@ -734,28 +691,14 @@ void Solution::readTxtToString(string filePath)
         infile.get(c);
         int c1 = (c < 0) ? c + 256 : c;
         string c2 = convert(c1);
-        // cout<<c2<<endl;
         Str_File_Connected.append(c2);
         cnt++;
     }
 
-    // infile.get(c);
-
-    // while (c != '\a') {
-    //     infile.get(c);
-    //     cout << "c: " << (int)c << endl;
-    //     Str_File_Connected.push_back(c);
-    // }
-    // cout<<Str_File_Connected[19627]<<endl;
-    // cout << Str_File_Connected.length() << endl;
-
-    // cout << "-----输入map-----" << endl;
-    // infile.get(c); // ？？？？？？？？？？？？
     while (infile.peek() != EOF)
     {
         infile.get(c);
         Str_File_Connected.push_back(c);
-        // cout<<"c: "<<(int)c<<endl;
     }
     infile.close();
 }
@@ -764,9 +707,9 @@ int main(int argc, char *argv[])
 {
     cout
         << "The usage of this program: " << endl
-        << "1. compact:    ziptxt   {original filename}  {compacted filename}"
+        << "1. zip:    ziptxt   {original filename}  {ziped filename}"
         << endl
-        << "2. uncompact:  unziptxt {compacted filename} {uncompacted filename}"
+        << "2. unzip:  unziptxt {ziped filename} {unziped filename}"
         << endl
         << "3. Enter ctrl+z to quit." << endl
         << endl;
@@ -775,31 +718,26 @@ int main(int argc, char *argv[])
     {
         if (a[0] == 'z')
         {
-            cout << "Compacting..." << endl;
+            cout << "zipping..." << endl;
             Solution s;
             s.readFlie(b);
-            // cout << 1;
             s.statistics(s.originalStr);
-            // cout << 2;
             s.judgeRelation();
-            // cout << 3;
             s.buildTree();
-            // cout << 4;
             s.encode();
-            // cout << 5;
             s.writeBinaryFile(c);
-            // cout << 6;
             s.countRate();
-            // cout << 7;
+            cout << "You can unzip the file, or enter Ctrl+Z to quit the program."<<endl;
         }
         else if (a[0] == 'u')
         {
-            cout << "Uncompacting..." << endl;
+            cout << "Unzipping..." << endl;
             Solution p;
             p.readTxtToString(b); // Str_FILE
             p.decode();
             p.writeStringToTxt(c);
-            cout << "Sucessfully uncompact!" << endl;
+            cout << "Successfully unzip!" << endl;
+            cout << "You can zip another file, or enter Ctrl+Z to quit the program."<<endl;
         }
     }
     return 0;
